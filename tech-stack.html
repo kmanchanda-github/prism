@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Tech Stack</title>
+  <style>
+    :root {
+      --blue:    #2563eb;
+      --blue-dk: #1e40af;
+      --blue-lt: #dbeafe;
+      --green:   #16a34a;
+      --green-lt:#dcfce7;
+      --amber:   #d97706;
+      --amber-lt:#fef3c7;
+      --purple:  #7c3aed;
+      --purple-lt:#ede9fe;
+      --rose:    #e11d48;
+      --rose-lt: #ffe4e6;
+      --teal:    #0d9488;
+      --teal-lt: #ccfbf1;
+      --orange:  #ea580c;
+      --orange-lt:#ffedd5;
+      --sky:     #0284c7;
+      --sky-lt:  #e0f2fe;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-400:#9ca3af;
+      --gray-500:#6b7280;
+      --gray-600:#4b5563;
+      --gray-700:#374151;
+      --gray-800:#1f2937;
+      --gray-900:#111827;
+      --radius:  12px;
+      --shadow:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:#f0f4f8; color:var(--gray-800); line-height:1.65; }
+
+    /* ── Hero ── */
+    .hero { background:linear-gradient(140deg,#0f172a 0%,#1e3a8a 55%,#1d4ed8 100%); color:#fff; padding:56px 40px 48px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); }
+    .hero-inner { max-width:1060px; margin:0 auto; position:relative; }
+    .hero-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:5px 14px; margin-bottom:20px; }
+    .hero h1 { font-size:clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; margin-bottom:12px; }
+    .hero h1 span { color:#93c5fd; }
+    .hero p { font-size:1rem; opacity:.8; max-width:580px; }
+
+    /* ── Tab bar ── */
+    .tab-bar-wrap { background:#fff; border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:100; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+    .tab-bar { max-width:1060px; margin:0 auto; display:flex; overflow-x:auto; scrollbar-width:none; padding:0 12px; }
+    .tab-bar::-webkit-scrollbar { display:none; }
+    .tab-btn { display:flex; align-items:center; gap:7px; padding:14px 18px; font-size:.8rem; font-weight:700; color:var(--gray-500); border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:color .15s, border-color .15s; background:none; border-top:none; border-left:none; border-right:none; font-family:inherit; }
+    .tab-btn:hover { color:var(--gray-800); }
+    .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+    .tab-icon { font-size:1rem; }
+
+    /* ── Content ── */
+    .container { max-width:1060px; margin:0 auto; padding:0 24px; }
+    .tab-panel { display:none; padding:44px 0 60px; }
+    .tab-panel.active { display:block; }
+
+    /* ── Panel header ── */
+    .panel-head { display:flex; align-items:flex-start; gap:20px; margin-bottom:36px; }
+    .panel-logo { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
+    .panel-head-text h2 { font-size:1.65rem; font-weight:800; letter-spacing:-.02em; margin-bottom:6px; }
+    .panel-head-text .tagline { font-size:.88rem; color:var(--gray-500); max-width:600px; }
+    .version-badge { display:inline-block; font-size:.67rem; font-weight:700; padding:2px 9px; border-radius:5px; margin-left:8px; vertical-align:middle; }
+
+    /* ── Overview strip ── */
+    .overview { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:22px 26px; margin-bottom:28px; box-shadow:var(--shadow); font-size:.9rem; color:var(--gray-700); line-height:1.75; }
+    .overview strong { color:var(--gray-900); }
+
+    /* ── Section label ── */
+    .sec-label { font-size:.67rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+    .sec-label::after { content:''; flex:1; max-width:32px; height:2px; background:var(--blue); border-radius:2px; opacity:.4; }
+
+    /* ── Two-col grid ── */
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
+    @media(max-width:680px){ .two-col { grid-template-columns:1fr; } }
+
+    /* ── Concept list ── */
+    .card { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); }
+    .card h3 { font-size:.93rem; font-weight:800; margin-bottom:14px; color:var(--gray-900); }
+    .concept { display:flex; gap:10px; margin-bottom:11px; }
+    .concept:last-child { margin-bottom:0; }
+    .c-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:7px; }
+    .c-title { font-size:.83rem; font-weight:700; color:var(--gray-800); }
+    .c-desc  { font-size:.79rem; color:var(--gray-500); margin-top:1px; line-height:1.5; }
+
+    /* ── Prism usage box ── */
+    .usage { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); }
+    .usage h3 { font-size:.93rem; font-weight:800; margin-bottom:12px; color:var(--gray-900); }
+    .usage-item { display:flex; gap:10px; margin-bottom:10px; font-size:.83rem; color:var(--gray-600); line-height:1.55; }
+    .usage-item:last-child { margin-bottom:0; }
+    .usage-icon { flex-shrink:0; }
+
+    /* ── Code block ── */
+    .code-wrap { margin-bottom:28px; }
+    .code-header { background:var(--gray-800); border-radius:var(--radius) var(--radius) 0 0; padding:9px 16px; display:flex; align-items:center; justify-content:space-between; }
+    .code-header span { font-size:.7rem; font-weight:700; color:var(--gray-400); letter-spacing:.05em; }
+    .code-lang { font-size:.65rem; background:rgba(255,255,255,.1); color:var(--gray-300); padding:2px 8px; border-radius:4px; font-family:monospace; }
+    pre { background:var(--gray-900); border-radius:0 0 var(--radius) var(--radius); padding:20px; overflow-x:auto; margin:0; font-family:"SF Mono","Fira Code","Fira Mono",monospace; font-size:.78rem; line-height:1.75; color:#e2e8f0; }
+    .kw { color:#93c5fd; }   /* keyword / decorator */
+    .fn { color:#86efac; }   /* function name */
+    .st { color:#fde68a; }   /* string */
+    .cm { color:#64748b; }   /* comment */
+    .tp { color:#f9a8d4; }   /* type */
+    .nm { color:#c4b5fd; }   /* number / constant */
+
+    /* ── Resources ── */
+    .resources { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); }
+    .resources h3 { font-size:.93rem; font-weight:800; margin-bottom:14px; }
+    .res-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100); }
+    .res-item:last-child { border-bottom:none; padding-bottom:0; }
+    .res-badge { font-size:.63rem; font-weight:700; padding:3px 8px; border-radius:5px; white-space:nowrap; flex-shrink:0; margin-top:2px; }
+    .rb-docs  { background:var(--blue-lt);   color:var(--blue-dk); }
+    .rb-tut   { background:var(--green-lt);  color:#14532d; }
+    .rb-book  { background:var(--purple-lt); color:#4c1d95; }
+    .rb-video { background:var(--rose-lt);   color:var(--rose); }
+    .res-info a { font-size:.83rem; font-weight:700; color:var(--gray-800); text-decoration:none; }
+    .res-info a:hover { color:var(--blue); }
+    .res-info p { font-size:.75rem; color:var(--gray-400); margin-top:2px; }
+
+    /* ── Footer ── */
+    footer { text-align:center; padding:36px 24px; font-size:.78rem; color:var(--gray-400); background:#fff; border-top:1px solid var(--gray-200); margin-top:32px; }
+    footer strong { color:var(--gray-600); }
+
+    /* ── Color helpers ── */
+    .bg-blue   { background:var(--blue-lt); }   .bg-green  { background:var(--green-lt); }
+    .bg-amber  { background:var(--amber-lt); }  .bg-purple { background:var(--purple-lt); }
+    .bg-rose   { background:var(--rose-lt); }   .bg-teal   { background:var(--teal-lt); }
+    .bg-orange { background:var(--orange-lt); } .bg-sky    { background:var(--sky-lt); }
+    .bg-gray   { background:var(--gray-100); }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚡ Tech Stack &nbsp;·&nbsp; Prism &nbsp;·&nbsp; May 2026</div>
+    <h1>Technologies Behind <span>Prism</span></h1>
+    <p>Quick overviews, key concepts, and learning resources for every technology in the stack — from the API layer to the AI pipeline.</p>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="fastapi">   <span class="tab-icon">⚡</span> FastAPI</button>
+    <button class="tab-btn"        data-tab="langgraph"> <span class="tab-icon">🕸️</span> LangGraph</button>
+    <button class="tab-btn"        data-tab="langchain"> <span class="tab-icon">🔗</span> LangChain</button>
+    <button class="tab-btn"        data-tab="celery">    <span class="tab-icon">🌿</span> Celery</button>
+    <button class="tab-btn"        data-tab="redis">     <span class="tab-icon">🔴</span> Redis</button>
+    <button class="tab-btn"        data-tab="postgres">  <span class="tab-icon">🐘</span> PostgreSQL</button>
+    <button class="tab-btn"        data-tab="sqlalchemy"><span class="tab-icon">🗃️</span> SQLAlchemy &amp; Alembic</button>
+    <button class="tab-btn"        data-tab="react">     <span class="tab-icon">⚛️</span> React &amp; Vite</button>
+    <button class="tab-btn"        data-tab="docker">    <span class="tab-icon">🐳</span> Docker</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ FASTAPI -->
+<div class="tab-panel active" id="tab-fastapi">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-green">⚡</div>
+      <div class="panel-head-text">
+        <h2>FastAPI <span class="version-badge" style="background:var(--green-lt);color:#14532d;">v0.115</span></h2>
+        <p class="tagline">Modern, high-performance Python web framework for building APIs with automatic OpenAPI docs, built-in async support, and Pydantic-powered validation.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      FastAPI sits at the <strong>top of the Python async web stack</strong>. You declare endpoints with plain Python functions and type hints; FastAPI handles request parsing, validation, serialisation, and generates interactive docs — all automatically. Under the hood it runs on <strong>Starlette</strong> (ASGI) and <strong>Pydantic</strong>. Benchmarks consistently put it among the fastest Python frameworks, on par with Node.js and Go for I/O-bound workloads.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Core building blocks</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Path operations</div><div class="c-desc">@app.get(), @app.post() etc. declare HTTP routes. The decorated function's return value is serialised to JSON automatically.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Pydantic models</div><div class="c-desc">Request bodies and responses are defined as Pydantic BaseModel subclasses. FastAPI validates inputs and rejects bad requests with a 422 before your code runs.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Dependency Injection (Depends)</div><div class="c-desc">Reusable logic (auth, DB sessions, config) is expressed as dependencies injected into endpoint function signatures via Depends().</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">async def vs def</div><div class="c-desc">Use async def for I/O-bound endpoints (DB queries, HTTP calls). FastAPI runs sync endpoints in a thread pool automatically.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Useful features</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Auto docs</div><div class="c-desc">/docs (Swagger UI) and /redoc are generated automatically from your route definitions and Pydantic models. Zero extra work.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">StreamingResponse / SSE</div><div class="c-desc">Return a StreamingResponse with an async generator to push data chunk-by-chunk. Prism uses this for chat token streaming.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">StaticFiles</div><div class="c-desc">Mount a directory as static files. Prism mounts ui/dist/ so FastAPI serves the compiled React app — single container, no separate web server.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Background Tasks</div><div class="c-desc">Lightweight post-response work without a full queue. For heavy jobs, delegate to Celery instead.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>Prism's API layer</h3>
+      <div class="usage-item"><span class="usage-icon">📬</span><span>All REST routes live under <code>src/api/routes/</code> — analysis CRUD, chat SSE, webhook intake, export, and action approval each in their own file.</span></div>
+      <div class="usage-item"><span class="usage-icon">🌊</span><span>The <code>/api/analysis/{id}/chat</code> endpoint returns a <code>StreamingResponse</code> via <code>sse-starlette</code>, pushing each LLM token as a <code>data: {...}</code> line the React client consumes in real time.</span></div>
+      <div class="usage-item"><span class="usage-icon">📁</span><span><code>app.mount("/", StaticFiles(directory="ui/dist", html=True))</code> serves the compiled React SPA. No Nginx needed in development or simple deployments.</span></div>
+      <div class="usage-item"><span class="usage-icon">💉</span><span><code>get_db()</code> is a FastAPI dependency that yields an <code>AsyncSession</code> and closes it after the response — consistent across every DB-touching route.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>src/api/routes/analysis.py — POST /api/analysis</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">@router</span>.<span class="fn">post</span>(<span class="st">"/api/analysis"</span>, response_model=AnalysisResponse)
+<span class="kw">async def</span> <span class="fn">create_analysis</span>(
+    payload: AnalysisRequest,             <span class="cm"># Pydantic validates the body</span>
+    db: AsyncSession = <span class="fn">Depends</span>(get_db),  <span class="cm"># injected DB session</span>
+):
+    report = AnalysisReportORM(**payload.<span class="fn">model_dump</span>())
+    db.<span class="fn">add</span>(report)
+    <span class="kw">await</span> db.<span class="fn">commit</span>()
+
+    task = run_analysis_task.<span class="fn">delay</span>(<span class="fn">str</span>(report.id))
+    <span class="kw">return</span> AnalysisResponse(job_id=task.id, report_id=report.id)</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn FastAPI</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://fastapi.tiangolo.com">fastapi.tiangolo.com</a><p>The official tutorial is one of the best in the Python ecosystem — interactive, incremental, and comprehensive.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://fastapi.tiangolo.com/tutorial/">FastAPI Tutorial (official)</a><p>Start here: path params → query params → request body → dependencies → async. Covers 90% of daily use in ~2 hours.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://testdriven.io/blog/fastapi-crud/">FastAPI + SQLAlchemy CRUD on testdriven.io</a><p>Practical guide covering async SQLAlchemy, Alembic migrations, and pytest — closely mirrors Prism's patterns.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.oreilly.com/library/view/building-data-science/9781098135423/">Building Data Science Applications with FastAPI (O'Reilly)</a><p>Goes deep on async patterns, WebSockets, background tasks, and production deployment.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ LANGGRAPH -->
+<div class="tab-panel" id="tab-langgraph">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-purple">🕸️</div>
+      <div class="panel-head-text">
+        <h2>LangGraph <span class="version-badge" style="background:var(--purple-lt);color:#4c1d95;">v0.2</span></h2>
+        <p class="tagline">Framework for building stateful, multi-actor LLM workflows as directed graphs. Each node is a Python function; edges define control flow; a typed State object flows through the graph.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      LangGraph models AI pipelines as <strong>directed graphs</strong> rather than linear chains. This unlocks parallelism (fan-out to multiple agents simultaneously), conditional routing (send to log agent only if logs are available), human-in-the-loop pauses (interrupt before executing a risky action), and full state persistence across long-running workflows. It is the <strong>backbone of Prism's analysis pipeline</strong>.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Graph primitives</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">StateGraph</div><div class="c-desc">The computation graph. You define it with a typed State class, add nodes, add edges, then call .compile() to get a runnable.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">Node</div><div class="c-desc">A Python function (sync or async) that receives the current State, does work, and returns a dict of state updates. Nodes are the units of work.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">Edge &amp; Conditional Edge</div><div class="c-desc">add_edge(A, B) always goes A→B. add_conditional_edges(A, router_fn) calls router_fn with state and routes to the returned node name.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">Send API (fan-out)</div><div class="c-desc">Return a list of Send(node, state) objects from a node to invoke that node in parallel with different inputs — how Prism runs log, code, and defect agents concurrently.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Advanced features</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">State &amp; Reducers</div><div class="c-desc">State is a TypedDict or Pydantic model. Annotate list fields with Annotated[list, operator.add] so parallel nodes append rather than overwrite.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">Checkpointer</div><div class="c-desc">Persist the full graph state to Postgres (AsyncPostgresSaver) or memory after every step. Enables resuming long workflows after a crash.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">interrupt()</div><div class="c-desc">Pause execution at a node and surface the current state to a human. Execution resumes when the human approves via Command(resume=...). Used for Prism's workaround approval gate.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--purple);"></div><div><div class="c-title">Subgraph</div><div class="c-desc">Compile a graph and use it as a node inside a parent graph. Enables composable, reusable pipelines.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>The analysis pipeline graph</h3>
+      <div class="usage-item"><span class="usage-icon">🔀</span><span><code>route_decision</code> checks which data sources are available and returns a list of <code>Send</code> objects — one per applicable sub-agent — triggering them in parallel.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔬</span><span>Each of <code>log_agent</code>, <code>code_agent</code>, and <code>defect_agent</code> runs concurrently, appending its findings to <code>state.agent_findings</code> via a list reducer.</span></div>
+      <div class="usage-item"><span class="usage-icon">✅</span><span><code>quality_check</code> uses a conditional edge — if the synthesised report score is below threshold it loops back to <code>synthesizer</code>; otherwise it proceeds to <code>notify</code>.</span></div>
+      <div class="usage-item"><span class="usage-icon">💾</span><span>An <code>AsyncPostgresSaver</code> checkpointer persists graph state after every node, so a Celery worker crash doesn't lose a partially complete analysis.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>src/agents/orchestrator.py — graph definition</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
+<span class="kw">from</span> langgraph.types <span class="kw">import</span> Send
+
+<span class="kw">def</span> <span class="fn">fan_out</span>(state: AnalysisState) -> <span class="fn">list</span>[Send]:
+    sends = []
+    <span class="kw">if</span> state.log_bundle_path:
+        sends.<span class="fn">append</span>(<span class="fn">Send</span>(<span class="st">"log_agent"</span>,   state))
+    <span class="kw">if</span> state.repo_url:
+        sends.<span class="fn">append</span>(<span class="fn">Send</span>(<span class="st">"code_agent"</span>,  state))
+    <span class="kw">if</span> state.jira_project_key:
+        sends.<span class="fn">append</span>(<span class="fn">Send</span>(<span class="st">"defect_agent"</span>, state))
+    <span class="kw">return</span> sends
+
+builder = <span class="fn">StateGraph</span>(AnalysisState)
+builder.<span class="fn">add_node</span>(<span class="st">"parse_incident"</span>, parse_incident)
+builder.<span class="fn">add_node</span>(<span class="st">"log_agent"</span>,     log_agent_node)
+builder.<span class="fn">add_node</span>(<span class="st">"synthesizer"</span>,   synthesizer_node)
+
+builder.<span class="fn">add_edge</span>(START, <span class="st">"parse_incident"</span>)
+builder.<span class="fn">add_conditional_edges</span>(<span class="st">"parse_incident"</span>, fan_out)
+builder.<span class="fn">add_edge</span>(<span class="st">"log_agent"</span>, <span class="st">"synthesizer"</span>)
+
+graph = builder.<span class="fn">compile</span>(checkpointer=checkpointer)</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn LangGraph</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://langchain-ai.github.io/langgraph/">langchain-ai.github.io/langgraph</a><p>Start with the Quickstart, then read the Concepts section — State, Nodes, Edges, and the Send API each have dedicated pages.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://langchain-ai.github.io/langgraph/tutorials/introduction/">LangGraph Introduction Tutorial</a><p>Builds a research agent step by step: simple graph → tools → human-in-the-loop → persistence. Best starting point.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://langchain-ai.github.io/langgraph/how-tos/branching/">How-to: Branching &amp; Parallel Nodes</a><p>Covers the Send API and fan-out/fan-in patterns — exactly what Prism uses for parallel agents.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-video">Video</span><div class="res-info"><a href="https://www.youtube.com/watch?v=R8KB-Zcynxc">LangGraph Crash Course — LangChain YouTube</a><p>45-minute walkthrough of the core primitives with live coding. Good complement to the written docs.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ LANGCHAIN -->
+<div class="tab-panel" id="tab-langchain">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-blue">🔗</div>
+      <div class="panel-head-text">
+        <h2>LangChain <span class="version-badge" style="background:var(--blue-lt);color:var(--blue-dk);">v0.3</span></h2>
+        <p class="tagline">Abstraction layer for LLMs, prompts, chains, and tools. Provides a unified interface across every major model provider so swapping models requires zero agent code changes.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      LangChain standardises how Python code talks to LLMs. Instead of importing the Anthropic SDK directly in every agent, you call <code>get_llm()</code> and receive a <strong>LangChain chat model object</strong> with a consistent <code>.invoke()</code> / <code>.stream()</code> / <code>.ainvoke()</code> API regardless of the underlying provider. This is the key enabler of Prism's <strong>pluggable LLM architecture</strong>.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Core primitives</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Chat Models</div><div class="c-desc">ChatAnthropic, ChatOpenAI, ChatGoogleGenerativeAI, ChatBedrock — all share the same interface. Call .invoke(messages) or await .ainvoke(messages).</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Messages</div><div class="c-desc">HumanMessage, AIMessage, SystemMessage. Build a conversation as a list and pass it to the model. No provider-specific format needed.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">PromptTemplate / ChatPromptTemplate</div><div class="c-desc">Parameterise prompts with variables. .format_messages(incident=...) fills the template at runtime without string concatenation.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Output Parsers</div><div class="c-desc">Transform raw LLM text into structured Python objects — JSON, Pydantic models, lists. Prism's synthesizer uses regex extraction as a lightweight alternative.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Invocation patterns</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.invoke() — sync</div><div class="c-desc">Blocks until the full response arrives. Returns an AIMessage. Use for batch/non-streaming work like the synthesizer.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.ainvoke() — async</div><div class="c-desc">Async version of invoke. Use inside async def functions (FastAPI routes, LangGraph async nodes) to avoid blocking the event loop.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.astream() — async streaming</div><div class="c-desc">Async generator yielding AIMessageChunk objects as the model produces tokens. Powers Prism's chat streaming endpoint.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">UsageMetadata</div><div class="c-desc">response.usage_metadata gives input_tokens and output_tokens. Prism's TokenTracker reads this after each agent call to accumulate cost.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>The get_llm() factory</h3>
+      <div class="usage-item"><span class="usage-icon">🏭</span><span><code>src/core/llm.py</code> reads <code>LLM_PROVIDER</code> and <code>LLM_MODEL</code> from env, lazy-imports only the relevant langchain-* package, and returns the appropriate chat model object.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔄</span><span>All four agents (log analyst, code analyst, defect analyst, synthesizer) call <code>get_llm()</code>. Switching from Anthropic to OpenAI means changing two env vars — no agent code changes.</span></div>
+      <div class="usage-item"><span class="usage-icon">💬</span><span>The chat agent calls <code>llm.astream(messages)</code> and yields each chunk's <code>.content</code> directly into the SSE response, achieving real-time token streaming to the browser.</span></div>
+      <div class="usage-item"><span class="usage-icon">📊</span><span>After each <code>.invoke()</code>, <code>response.usage_metadata</code> is read and recorded into <code>TokenTracker</code> for per-analysis cost attribution.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>src/core/llm.py — provider factory</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">def</span> <span class="fn">get_llm</span>(*, max_tokens: <span class="tp">int</span> | <span class="tp">None</span> = <span class="nm">None</span>, temperature: <span class="tp">float</span> | <span class="tp">None</span> = <span class="nm">None</span>):
+    provider = settings.llm_provider   <span class="cm"># e.g. "anthropic"</span>
+    model    = settings.llm_model      <span class="cm"># e.g. "claude-sonnet-4-6"</span>
+
+    <span class="kw">if</span> provider == <span class="st">"anthropic"</span>:
+        <span class="kw">from</span> langchain_anthropic <span class="kw">import</span> ChatAnthropic
+        <span class="kw">return</span> <span class="fn">ChatAnthropic</span>(model=model, max_tokens=max_tokens,
+                              api_key=settings.anthropic_api_key)
+    <span class="kw">if</span> provider == <span class="st">"openai"</span>:
+        <span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+        <span class="kw">return</span> <span class="fn">ChatOpenAI</span>(model=model, max_tokens=max_tokens,
+                           api_key=settings.openai_api_key)
+    <span class="cm"># ... google, bedrock ...</span>
+    <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">f"Unknown LLM_PROVIDER='{provider}'"</span>)</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn LangChain</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://python.langchain.com/docs/introduction/">python.langchain.com</a><p>Focus on the Chat Models and Messages sections first. LCEL (LangChain Expression Language) is worth understanding for chaining components.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://python.langchain.com/docs/tutorials/llm_chain/">Build a Simple LLM Chain</a><p>10-minute tutorial covering ChatModel + PromptTemplate + OutputParser — the most common pattern.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://python.langchain.com/docs/how_to/streaming/">How to stream responses</a><p>Covers .stream(), .astream(), and streaming with LCEL chains — essential for understanding Prism's chat implementation.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ CELERY -->
+<div class="tab-panel" id="tab-celery">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-green">🌿</div>
+      <div class="panel-head-text">
+        <h2>Celery <span class="version-badge" style="background:var(--green-lt);color:#14532d;">v5.4</span></h2>
+        <p class="tagline">Distributed task queue for Python. Offloads long-running jobs to background workers so the API responds instantly, with automatic retries, scheduling, and horizontal scaling.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      AI incident analysis takes 2–15 minutes. If the API waited for it to finish, HTTP requests would time out and the user experience would be terrible. Celery solves this by <strong>decoupling job submission from job execution</strong>: the API enqueues a task (returns immediately with a job ID), and one of many background <strong>workers</strong> picks it up, runs it, and stores the result. Workers scale independently of the API — add more machines, handle more concurrent analyses.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Core model</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Task</div><div class="c-desc">A Python function decorated with @celery_app.task. Call task.delay(*args) to enqueue it. Celery serialises the args and pushes a message to the broker.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Broker</div><div class="c-desc">The message queue between producer (API) and consumers (workers). Prism uses Redis. RabbitMQ is the other common choice.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Worker</div><div class="c-desc">A process that connects to the broker, polls for tasks, executes them, and writes results to the result backend. Run with: celery -A app worker.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Result backend</div><div class="c-desc">Where task state (PENDING, STARTED, SUCCESS, FAILURE) and return values are stored. Prism uses Redis. AsyncResult(task_id).state polls the status.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Production settings</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">concurrency</div><div class="c-desc">Number of worker child processes (default = CPU count). Set to 100 for Prism's scale target. Each analysis runs in its own process.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">worker_max_tasks_per_child</div><div class="c-desc">Restart the child process after N tasks. Prevents memory leaks from accumulating. Prism sets this to 50.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">task_time_limit</div><div class="c-desc">Hard kill a task after this many seconds. Prevents runaway LLM calls from blocking workers forever.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--green);"></div><div><div class="c-title">Celery Beat</div><div class="c-desc">Scheduler for periodic tasks (cron-like). Runs as a separate process. Prism uses it for scheduled metric aggregation.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>The analysis task</h3>
+      <div class="usage-item"><span class="usage-icon">📤</span><span>When <code>POST /api/analysis</code> receives a submission, it calls <code>run_analysis_task.delay(report_id)</code> and immediately returns <code>{job_id, report_id}</code> to the caller.</span></div>
+      <div class="usage-item"><span class="usage-icon">⚙️</span><span>The Celery worker picks up the task, runs the full LangGraph pipeline (which may take several minutes), and writes the resulting Markdown report as a new <code>AnalysisVersionORM</code> row.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔄</span><span>The React UI polls <code>GET /api/analysis/{id}</code> every 3 seconds (React Query). When status flips from <code>running</code> to <code>complete</code>, the report renders automatically.</span></div>
+      <div class="usage-item"><span class="usage-icon">📊</span><span>Worker concurrency is set to 100 in docker-compose.yml, with <code>worker_max_tasks_per_child=50</code> to keep memory footprint bounded.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>src/api/worker.py — task definition</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">from</span> celery <span class="kw">import</span> Celery
+
+celery_app = <span class="fn">Celery</span>(<span class="st">"prism"</span>,
+    broker=settings.redis_url,
+    backend=settings.redis_url,
+    broker_connection_retry_on_startup=<span class="nm">True</span>,
+)
+celery_app.conf.worker_max_tasks_per_child = <span class="nm">50</span>
+
+<span class="kw">@celery_app</span>.<span class="fn">task</span>(bind=<span class="nm">True</span>, max_retries=<span class="nm">2</span>)
+<span class="kw">def</span> <span class="fn">run_analysis_task</span>(self, report_id: <span class="tp">str</span>):
+    <span class="kw">try</span>:
+        asyncio.<span class="fn">run</span>(<span class="fn">_run</span>(report_id))
+    <span class="kw">except</span> Exception <span class="kw">as</span> exc:
+        <span class="kw">raise</span> self.<span class="fn">retry</span>(exc=exc, countdown=<span class="nm">30</span>)</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn Celery</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://docs.celeryq.dev/en/stable/">docs.celeryq.dev</a><p>Read "First Steps with Celery" then "Next Steps". The Configuration reference is invaluable for production tuning.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://testdriven.io/courses/fastapi-celery/">FastAPI + Celery on testdriven.io</a><p>Full project-based course covering task queues, Redis backend, flower monitoring, and Docker. Mirrors Prism's setup closely.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.oreilly.com/library/view/distributed-task-processing/9781789139990/">Distributed Task Processing with Celery (Packt)</a><p>Covers routing, rate limiting, beat scheduling, and production hardening in depth.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ REDIS -->
+<div class="tab-panel" id="tab-redis">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-rose">🔴</div>
+      <div class="panel-head-text">
+        <h2>Redis <span class="version-badge" style="background:var(--rose-lt);color:var(--rose);">v7</span></h2>
+        <p class="tagline">In-memory data store used as Celery's message broker and result backend. Sub-millisecond reads and writes, with optional persistence, pub/sub, and expiry.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      Redis is an <strong>in-memory key-value store</strong> that can also act as a message queue (via lists), a pub/sub system, a cache, and a session store. Its speed comes from keeping all data in RAM. In Prism it has two roles: <strong>broker</strong> (Celery pushes task messages in; workers pop them out) and <strong>result backend</strong> (task state and return values stored as keys with TTL).
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Data structures</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">String</div><div class="c-desc">The simplest type — any binary-safe value. SET key value / GET key. Celery result backend stores task state here with an optional EX (expiry in seconds).</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">List</div><div class="c-desc">Ordered sequence with O(1) push/pop at both ends. Celery's broker uses LPUSH (producer) and BRPOP (blocking pop by worker) to implement the task queue.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">Hash</div><div class="c-desc">Field-value map stored under one key. Efficient for storing structured objects like session data or task metadata.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">Pub/Sub</div><div class="c-desc">PUBLISH channel message / SUBSCRIBE channel. Used for real-time event broadcasting. Not used in Prism today but available for Phase 3 notifications.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Operations &amp; persistence</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">TTL (Time To Live)</div><div class="c-desc">EXPIRE key seconds sets an expiry. Keys are auto-deleted when they expire. Celery sets a TTL on result keys so the DB doesn't grow unbounded.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">RDB Snapshots</div><div class="c-desc">Periodic point-in-time dumps to disk (redis.conf: save 900 1). Fast restart but may lose the last few seconds of data on crash.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">AOF (Append Only File)</div><div class="c-desc">Every write command is appended to a log file. Survives crashes with minimal data loss. Slower writes, better durability.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--rose);"></div><div><div class="c-title">Connection via URL</div><div class="c-desc">redis://localhost:6379/0 — host, port, database number (0–15). Prism reads REDIS_URL from env and passes it to both Celery broker and backend config.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>Broker + result backend</h3>
+      <div class="usage-item"><span class="usage-icon">📬</span><span>When <code>run_analysis_task.delay(report_id)</code> is called, Celery serialises the task message and does an LPUSH onto a Redis list named after the queue (default: <code>celery</code>).</span></div>
+      <div class="usage-item"><span class="usage-icon">👷</span><span>Each worker process blocks on BRPOP for the queue list. When a message arrives, the first worker to pop it begins execution — natural load balancing with no extra config.</span></div>
+      <div class="usage-item"><span class="usage-icon">📊</span><span>Task state (PENDING → STARTED → SUCCESS/FAILURE) is written to Redis string keys prefixed with <code>celery-task-meta-{task_id}</code>, with a TTL of 24 hours by default.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>CLI — useful Redis commands for debugging</span><span class="code-lang">Shell</span></div>
+      <pre><span class="cm"># Connect to the running Redis container</span>
+docker <span class="fn">exec</span> -it prism-redis-1 redis-cli
+
+<span class="cm"># See how many tasks are queued</span>
+LLEN celery
+
+<span class="cm"># Inspect a task result by ID</span>
+GET celery-task-meta-&lt;task-id&gt;
+
+<span class="cm"># Monitor all commands in real time</span>
+MONITOR
+
+<span class="cm"># List all keys matching a pattern</span>
+KEYS celery-task-meta-*</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn Redis</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://redis.io/docs/">redis.io/docs</a><p>The "Data Types" section explains every structure with examples. The "Commands" reference is the definitive API.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://redis.io/learn/howtos/quick-start">Redis Quick Start</a><p>Interactive 15-minute browser tutorial — install-free, hands-on with strings, lists, hashes, and expiry.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.manning.com/books/redis-in-action">Redis in Action (Manning)</a><p>Chapter 6 (application components) covers the queue and pub/sub patterns in depth. The most practical Redis book available.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ POSTGRESQL -->
+<div class="tab-panel" id="tab-postgres">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-blue">🐘</div>
+      <div class="panel-head-text">
+        <h2>PostgreSQL <span class="version-badge" style="background:var(--blue-lt);color:var(--blue-dk);">v16</span></h2>
+        <p class="tagline">Open-source relational database. ACID-compliant, highly extensible, with native JSON support, full-text search, and a rich ecosystem — the industry default for structured data.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      PostgreSQL stores every analysis report, every version, every chat message, and every token usage record in <strong>strongly-typed, indexed, relational tables</strong>. It handles transactions correctly — if saving a new analysis version fails partway through, the DB rolls back automatically and no partial data is committed. Its <strong>JSONB column type</strong> lets Prism store semi-structured agent findings alongside typed relational columns, without needing a separate document store.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Relational fundamentals</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Tables, rows, columns</div><div class="c-desc">Data is organised in tables with a fixed schema. Each column has a type (TEXT, INTEGER, TIMESTAMPTZ, UUID, JSONB) enforced by the DB engine.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">ACID Transactions</div><div class="c-desc">Atomicity, Consistency, Isolation, Durability. All writes in a BEGIN/COMMIT block either fully succeed or fully roll back. Critical for multi-table updates.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Foreign Keys &amp; JOINs</div><div class="c-desc">analysis_versions.report_id references analysis_reports.id. JOINs combine rows from multiple tables in a single query without N+1 round trips.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Indexes</div><div class="c-desc">B-tree index on frequently queried columns (e.g. report_id, created_at) dramatically speeds up SELECT queries. GIN indexes accelerate JSONB field queries.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>PostgreSQL-specific features</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">UUID primary keys</div><div class="c-desc">gen_random_uuid() generates collision-resistant IDs distributed across shards — safer than sequential integers for public-facing APIs.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">JSONB</div><div class="c-desc">Stores JSON as binary. Supports indexing (GIN), containment operators (@>), and path extraction (data->'key'). Prism stores agent_findings as JSONB.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">TIMESTAMPTZ</div><div class="c-desc">Timestamp with time zone. Always store in UTC and let the application layer convert for display. Avoids DST bugs in multi-region deployments.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">pg_trgm / Full-text search</div><div class="c-desc">Built-in trigram similarity and tsvector full-text search. Can search Markdown report content without Elasticsearch for Phase 2+.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>Prism's data model</h3>
+      <div class="usage-item"><span class="usage-icon">📋</span><span><code>analysis_reports</code> — one row per incident submission: title, severity, description, status, source system, metadata.</span></div>
+      <div class="usage-item"><span class="usage-icon">📝</span><span><code>analysis_versions</code> — one row per report revision: version number, full Markdown content, agent findings (JSONB), editor (AI or user email), created_at.</span></div>
+      <div class="usage-item"><span class="usage-icon">💬</span><span><code>chat_messages</code> — ordered conversation history per analysis: role (user/assistant), content, timestamp.</span></div>
+      <div class="usage-item"><span class="usage-icon">📊</span><span><code>token_usage</code> — per-agent, per-analysis token counts and estimated cost in USD, used by the Phase 3 dashboard.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>Useful psql commands for debugging Prism</span><span class="code-lang">SQL</span></div>
+      <pre><span class="cm">-- Connect</span>
+<span class="fn">psql</span> postgresql://prism:prism_dev_password@localhost/<span class="st">prism</span>
+
+<span class="cm">-- List all analyses with their current status</span>
+<span class="kw">SELECT</span> id, title, status, created_at
+<span class="kw">FROM</span>   analysis_reports
+<span class="kw">ORDER BY</span> created_at <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="nm">10</span>;
+
+<span class="cm">-- Count versions per report</span>
+<span class="kw">SELECT</span> report_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> versions
+<span class="kw">FROM</span>   analysis_versions
+<span class="kw">GROUP BY</span> report_id <span class="kw">ORDER BY</span> versions <span class="kw">DESC</span>;
+
+<span class="cm">-- Query inside JSONB agent findings</span>
+<span class="kw">SELECT</span> agent_findings-><span class="st">'log_analysis'</span>->><span class="st">'severity'</span>
+<span class="kw">FROM</span>   analysis_versions <span class="kw">WHERE</span> version_number = <span class="nm">0</span>;</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn PostgreSQL</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://www.postgresql.org/docs/current/">postgresql.org/docs</a><p>The official manual is comprehensive. Start with the Tutorial section, then Data Types and SQL Commands.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://www.postgresqltutorial.com/">postgresqltutorial.com</a><p>Beginner-friendly site with 200+ examples covering everything from SELECT to window functions and full-text search.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.oreilly.com/library/view/postgresql-up-and/9781492080274/">PostgreSQL: Up and Running (O'Reilly)</a><p>Practical book covering installation, data types, queries, performance, and replication. Chapter on JSONB is particularly relevant.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ SQLALCHEMY + ALEMBIC -->
+<div class="tab-panel" id="tab-sqlalchemy">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-amber">🗃️</div>
+      <div class="panel-head-text">
+        <h2>SQLAlchemy &amp; Alembic <span class="version-badge" style="background:var(--amber-lt);color:#78350f;">v2 / v1.13</span></h2>
+        <p class="tagline">SQLAlchemy maps Python classes to database tables and generates SQL. Alembic tracks schema changes as versioned migration scripts — the standard ORM + migration stack for Python.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      Writing raw SQL in application code is brittle and hard to maintain. SQLAlchemy provides an <strong>ORM (Object Relational Mapper)</strong> — you define models as Python classes and interact with the DB using Python objects and methods. Alembic sits alongside it to manage <strong>schema evolution</strong>: when you change a model, Alembic generates a migration script that upgrades (or rolls back) the database schema safely without manual SQL.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>SQLAlchemy ORM</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">DeclarativeBase</div><div class="c-desc">Base class all ORM models inherit from. Provides the metaclass magic that maps Python class attributes to DB columns.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">Mapped[T] columns</div><div class="c-desc">SQLAlchemy 2.0 syntax: class id: Mapped[UUID] = mapped_column(primary_key=True). Type hints drive column type inference and IDE autocompletion.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">AsyncSession</div><div class="c-desc">Async version of Session. Use async with AsyncSession() as session, then await session.execute(select(Model)). Required for FastAPI async endpoints.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">select() / scalars()</div><div class="c-desc">Build queries with select(Model).where(Model.id == id). Execute with await session.execute(q), fetch results with .scalars().all() or .scalar_one().</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Alembic migrations</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">alembic revision --autogenerate</div><div class="c-desc">Compares your ORM models to the current DB schema and generates a migration script with upgrade() and downgrade() functions. Always review before applying.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">alembic upgrade head</div><div class="c-desc">Applies all pending migrations in order. Alembic tracks which have run in the alembic_version table. Safe to run multiple times (idempotent).</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">alembic downgrade -1</div><div class="c-desc">Rolls back the most recent migration. Useful in development; dangerous in production without a tested downgrade() function.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--amber);"></div><div><div class="c-title">alembic/versions/</div><div class="c-desc">Each migration is a Python file with a unique revision ID, a down_revision pointer (forming a chain), and upgrade()/downgrade() functions.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>Async ORM + migrations</h3>
+      <div class="usage-item"><span class="usage-icon">🏗️</span><span>All ORM models live in <code>src/models/</code>: <code>AnalysisReportORM</code>, <code>AnalysisVersionORM</code>, <code>ChatMessageORM</code>, <code>TokenUsageORM</code> — each a <code>DeclarativeBase</code> subclass.</span></div>
+      <div class="usage-item"><span class="usage-icon">💉</span><span><code>get_db()</code> is a FastAPI dependency that yields an <code>AsyncSession</code> via <code>AsyncSessionLocal</code> and closes it after the response — all routes receive a fresh, auto-closed session.</span></div>
+      <div class="usage-item"><span class="usage-icon">⚡</span><span>The async engine uses <code>asyncpg</code> (non-blocking Postgres driver). Alembic uses a separate sync connection (<code>psycopg2</code>) because Alembic's internals don't support async.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔄</span><span>Workflow for schema changes: update model → <code>alembic revision --autogenerate -m "description"</code> → review generated file → <code>alembic upgrade head</code>.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>src/models/report.py — ORM model example</span><span class="code-lang">Python</span></div>
+      <pre><span class="kw">from</span> sqlalchemy.orm <span class="kw">import</span> DeclarativeBase, Mapped, mapped_column
+<span class="kw">from</span> sqlalchemy <span class="kw">import</span> String, DateTime, func
+<span class="kw">import</span> uuid
+
+<span class="kw">class</span> <span class="tp">AnalysisReportORM</span>(Base):
+    __tablename__ = <span class="st">"analysis_reports"</span>
+
+    id:         <span class="tp">Mapped</span>[uuid.UUID]  = <span class="fn">mapped_column</span>(primary_key=<span class="nm">True</span>, default=uuid.uuid4)
+    title:      <span class="tp">Mapped</span>[<span class="tp">str</span>]       = <span class="fn">mapped_column</span>(<span class="fn">String</span>(<span class="nm">512</span>))
+    status:     <span class="tp">Mapped</span>[<span class="tp">str</span>]       = <span class="fn">mapped_column</span>(<span class="fn">String</span>(<span class="nm">32</span>), default=<span class="st">"pending"</span>)
+    created_at: <span class="tp">Mapped</span>[datetime]   = <span class="fn">mapped_column</span>(server_default=func.<span class="fn">now</span>())</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn SQLAlchemy &amp; Alembic</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://docs.sqlalchemy.org/en/20/">docs.sqlalchemy.org</a><p>Read the ORM Quickstart first, then the "Using AsyncSession" guide. The 2.0 style (Mapped[T]) is what Prism uses throughout.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://alembic.sqlalchemy.org/en/latest/">alembic.sqlalchemy.org</a><p>The Tutorial and "Auto-generating Migrations" sections cover the daily workflow. Read the "Operations" reference when you need to do non-trivial schema changes.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://fastapi.tiangolo.com/tutorial/sql-databases/">FastAPI SQL Databases Tutorial</a><p>Official FastAPI guide using SQLAlchemy 2.0 with async sessions — the exact pattern Prism follows.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ REACT + VITE -->
+<div class="tab-panel" id="tab-react">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-sky">⚛️</div>
+      <div class="panel-head-text">
+        <h2>React &amp; Vite <span class="version-badge" style="background:var(--sky-lt);color:var(--sky);">React 18 / Vite 5</span></h2>
+        <p class="tagline">React is a declarative component-based UI library. Vite is its modern build tool — instant HMR in dev, optimised output for production. Together they power Prism's engineer-facing interface.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      React lets you build UIs as a tree of <strong>components</strong> — reusable functions that return JSX (HTML-like syntax in JavaScript). When data changes, React re-renders only the affected parts of the DOM. Vite replaces Webpack with native ES module serving during development (near-instant HMR) and Rollup for production bundles. TypeScript adds static typing, catching errors before they reach the browser.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>React fundamentals</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Components &amp; Props</div><div class="c-desc">Functions that accept a props object and return JSX. Composable — build complex UIs from small, focused components. Props flow top-down (parent → child).</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">useState</div><div class="c-desc">Local component state. const [value, setValue] = useState(initial). Calling setValue triggers a re-render. Keep state as minimal as possible.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">useEffect</div><div class="c-desc">Runs after render for side effects (data fetching, subscriptions, DOM manipulation). The dependency array controls when it re-runs.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Custom Hooks</div><div class="c-desc">Functions starting with "use" that encapsulate stateful logic. useAnalysis and useChat in Prism abstract away polling and SSE streaming.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Libraries in use</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">React Query (TanStack Query)</div><div class="c-desc">Server-state management. useQuery fetches data, caches it, and re-fetches on a configurable interval. Prism polls GET /api/analysis/{id} every 3s while status=running.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">React Router v6</div><div class="c-desc">Client-side routing. BrowserRouter + Route components map URL paths to page components. "/" → SubmitPage, "/analysis/:id" → AnalysisPage.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">react-markdown</div><div class="c-desc">Renders Markdown strings as React elements. ReportViewer uses it to display the AI-generated analysis report with proper formatting.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Vite proxy</div><div class="c-desc">vite.config.ts: proxy /api → http://localhost:8000. Requests to /api in dev hit the FastAPI backend; no CORS issues during development.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>The Prism frontend</h3>
+      <div class="usage-item"><span class="usage-icon">📋</span><span><strong>SubmitPage</strong> — a form (title, severity, description, log bundle upload) that POSTs to <code>/api/analysis</code>, then navigates to the analysis page with the returned ID.</span></div>
+      <div class="usage-item"><span class="usage-icon">📊</span><span><strong>AnalysisPage</strong> — polls status via <code>useAnalysis</code>. Shows a spinner while running; renders <code>ReportViewer</code> + <code>ChatPanel</code> + <code>ActionBar</code> when complete.</span></div>
+      <div class="usage-item"><span class="usage-icon">💬</span><span><strong>useChat</strong> — opens an EventSource SSE connection to <code>/api/analysis/{id}/chat</code>, accumulates token chunks, detects <code>suggested_edit</code> payloads, and exposes them to <code>ChatPanel</code>.</span></div>
+      <div class="usage-item"><span class="usage-icon">📝</span><span><strong>ReportViewer</strong> — toggles between read-only markdown display and an editable textarea. On save, PATCHes the report and invalidates the React Query cache to refetch.</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>ui/src/hooks/useAnalysis.ts — polling with React Query</span><span class="code-lang">TypeScript</span></div>
+      <pre><span class="kw">import</span> { useQuery } <span class="kw">from</span> <span class="st">"@tanstack/react-query"</span>;
+
+<span class="kw">export function</span> <span class="fn">useAnalysis</span>(id: <span class="tp">string</span>) {
+  <span class="kw">return</span> <span class="fn">useQuery</span>({
+    queryKey: [<span class="st">"analysis"</span>, id],
+    queryFn:  () => <span class="fn">fetch</span>(<span class="st">`/api/analysis/</span>${id}<span class="st">`</span>).<span class="fn">then</span>(r => r.<span class="fn">json</span>()),
+    <span class="cm">// poll every 3 s while the job is still running</span>
+    refetchInterval: (data) =>
+      [<span class="st">"pending"</span>, <span class="st">"running"</span>].<span class="fn">includes</span>(data?.status) ? <span class="nm">3000</span> : <span class="nm">false</span>,
+  });
+}</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn React &amp; Vite</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://react.dev/learn">react.dev/learn</a><p>The new official docs (2023 rewrite) are excellent. "Thinking in React" and the Hooks sections are essential reading.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://vitejs.dev/guide/">vitejs.dev/guide</a><p>Short guide covering the dev server, config, proxy setup, and the build output. Read the proxy section to understand how Prism avoids CORS in dev.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://tanstack.com/query/latest/docs/framework/react/quick-start">TanStack Query Quick Start</a><p>Covers useQuery, useMutation, and invalidation — the three patterns Prism uses for all API interaction.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.oreilly.com/library/view/learning-react-2nd/9781492051718/">Learning React (O'Reilly, 2nd ed.)</a><p>Comprehensive coverage of hooks, context, routing, and testing with a functional-component focus throughout.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ DOCKER -->
+<div class="tab-panel" id="tab-docker">
+  <div class="container">
+    <div class="panel-head">
+      <div class="panel-logo bg-sky">🐳</div>
+      <div class="panel-head-text">
+        <h2>Docker <span class="version-badge" style="background:var(--sky-lt);color:var(--sky);">v26</span></h2>
+        <p class="tagline">Containerisation platform that packages your app and its dependencies into portable, reproducible containers. Docker Compose orchestrates multiple services locally with a single command.</p>
+      </div>
+    </div>
+
+    <div class="overview">
+      Without Docker, setting up Prism locally means installing Postgres 16, Redis 7, the right Python version, uv, and Node — with exact version matching across machines. Docker packages each service into a <strong>container</strong>: an isolated, reproducible environment. <code>docker compose up -d</code> starts all five services (Postgres, Redis, API, Celery worker, Celery Beat) in one command, identically, on any machine.
+    </div>
+
+    <div class="sec-label">Key Concepts</div>
+    <div class="two-col" style="margin-bottom:28px;">
+      <div class="card">
+        <h3>Core model</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Dockerfile</div><div class="c-desc">A recipe file — each instruction (FROM, RUN, COPY, CMD) adds a layer to the image. Layers are cached, so only changed layers rebuild on the next build.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Image vs Container</div><div class="c-desc">An image is the snapshot (built from Dockerfile). A container is a running instance of an image. Multiple containers can run from the same image simultaneously.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">docker-compose.yml</div><div class="c-desc">Defines multiple services, their images/build context, environment variables, ports, volumes, and inter-service dependencies. The source of truth for the local dev stack.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Volumes</div><div class="c-desc">Mount paths that persist data outside the container lifecycle. Prism mounts a named volume for Postgres data so the DB survives container restarts.</div></div></div>
+      </div>
+      <div class="card">
+        <h3>Networking &amp; operations</h3>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Service networking</div><div class="c-desc">Containers in the same Compose project share a network and reach each other by service name. The API connects to Postgres at postgresql://postgres:5432/prism — not localhost.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">Port mapping</div><div class="c-desc">ports: "8000:8000" maps host port 8000 to container port 8000. Only exposed ports are reachable from outside Docker. Internal communication uses the service name.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">env_file &amp; environment</div><div class="c-desc">env_file: [.env] injects all variables from .env into the container. Sensitive values stay out of docker-compose.yml and out of git.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--sky);"></div><div><div class="c-title">depends_on + healthcheck</div><div class="c-desc">depends_on: postgres: condition: service_healthy ensures the API waits for Postgres to be ready before starting — avoids race-condition startup failures.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-label">How Prism Uses It</div>
+    <div class="usage" style="margin-bottom:28px;">
+      <h3>Prism's Compose stack</h3>
+      <div class="usage-item"><span class="usage-icon">🐘</span><span><strong>postgres</strong> — official postgres:16 image, named volume for data persistence, health-checked with <code>pg_isready</code>.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔴</span><span><strong>redis</strong> — official redis:7-alpine image. Lightweight; alpine variant saves ~100 MB image size.</span></div>
+      <div class="usage-item"><span class="usage-icon">⚡</span><span><strong>api</strong> — built from the project Dockerfile. Runs <code>uvicorn src.api.main:app --host 0.0.0.0 --port 8000</code>. Port 8000 exposed to host.</span></div>
+      <div class="usage-item"><span class="usage-icon">🌿</span><span><strong>worker</strong> — same image, different CMD: <code>celery -A src.api.worker.celery_app worker --concurrency=4</code>. Scale to more workers by raising concurrency or running multiple replicas.</span></div>
+      <div class="usage-item"><span class="usage-icon">🕐</span><span><strong>worker-beat</strong> — same image, runs Celery Beat scheduler for periodic tasks. Only one instance should run (no duplicate scheduled jobs).</span></div>
+    </div>
+
+    <div class="sec-label">Code Snapshot</div>
+    <div class="code-wrap">
+      <div class="code-header"><span>Dockerfile — multi-stage Python image</span><span class="code-lang">Dockerfile</span></div>
+      <pre><span class="kw">FROM</span> python:3.12-slim <span class="kw">AS</span> base
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># Install uv for fast dependency resolution</span>
+<span class="kw">RUN</span> pip install uv
+
+<span class="cm"># Install dependencies (cached layer unless pyproject.toml changes)</span>
+<span class="kw">COPY</span> pyproject.toml .
+<span class="kw">RUN</span> uv pip install --system -e ".[anthropic]"
+
+<span class="cm"># Copy source last — keeps source-change rebuilds fast</span>
+<span class="kw">COPY</span> src/ ./src/
+<span class="kw">COPY</span> ui/dist/ ./ui/dist/
+
+<span class="kw">CMD</span> ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]</pre>
+    </div>
+
+    <div class="sec-label">Resources</div>
+    <div class="resources">
+      <h3>Where to learn Docker</h3>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://docs.docker.com/get-started/">docs.docker.com/get-started</a><p>The official Getting Started guide is a hands-on walkthrough: build an image, run a container, use Compose. Best first 2 hours.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://docs.docker.com/compose/">docs.docker.com/compose</a><p>Complete Compose reference including the Compose file specification — the authoritative source for every docker-compose.yml key.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://testdriven.io/blog/fastapi-docker/">Containerising FastAPI with Docker on testdriven.io</a><p>Covers Dockerfile best practices (layer caching, non-root user, multi-stage builds) with a FastAPI app — directly applicable to Prism.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-book">Book</span><div class="res-info"><a href="https://www.manning.com/books/docker-in-action-second-edition">Docker in Action (Manning, 2nd ed.)</a><p>Deep coverage of networking, volumes, multi-stage builds, and orchestration. Chapter 10 on Compose is especially relevant.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Prism</strong> &nbsp;·&nbsp; Tech Stack Reference &nbsp;·&nbsp; May 2026<br>
+  &copy; 2026 Kapil Manchanda. All rights reserved. Unauthorised reproduction or distribution of this document is prohibited.
+</footer>
+
+<script>
+  const btns   = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      btns.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
