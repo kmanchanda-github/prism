@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Project Report</title>
+  <style>
+    :root {
+      --blue:    #2563eb;
+      --blue-lt: #dbeafe;
+      --green:   #16a34a;
+      --green-lt:#dcfce7;
+      --amber:   #d97706;
+      --amber-lt:#fef3c7;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-400:#9ca3af;
+      --gray-600:#4b5563;
+      --gray-800:#1f2937;
+      --gray-900:#111827;
+      --radius:  10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+      color: #fff;
+      padding: 56px 40px 48px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+    .hero h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 14px; }
+    .hero p  { font-size: 1.1rem; opacity: .85; max-width: 680px; margin: 0 auto 32px; }
+    .hero-meta { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+    .hero-meta-item { text-align: center; }
+    .hero-meta-item .val { font-size: 1.6rem; font-weight: 700; }
+    .hero-meta-item .lbl { font-size: .75rem; opacity: .7; text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 52px 0; border-bottom: 1px solid var(--gray-200); }
+    .section:last-child { border-bottom: none; }
+    .section-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 8px;
+    }
+    .section-title { font-size: 1.7rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+    .section-sub   { color: var(--gray-600); margin-bottom: 32px; max-width: 640px; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card-grid { display: grid; gap: 20px; }
+    .card-grid-2 { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .card-grid-3 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+    .card-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 14px;
+    }
+    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .card-body  { font-size: .875rem; color: var(--gray-600); }
+
+    /* ── Architecture flow ── */
+    .arch-wrap { overflow-x: auto; }
+    .arch {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0; min-width: 600px;
+    }
+    .arch-row { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
+    .arch-box {
+      background: #fff; border: 2px solid var(--gray-200);
+      border-radius: var(--radius); padding: 12px 20px;
+      text-align: center; font-size: .82rem; font-weight: 600;
+      color: var(--gray-800); min-width: 130px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .arch-box.blue  { border-color: var(--blue);  background: var(--blue-lt);  color: #1e40af; }
+    .arch-box.green { border-color: #16a34a; background: var(--green-lt); color: #14532d; }
+    .arch-box.amber { border-color: var(--amber); background: var(--amber-lt); color: #92400e; }
+    .arch-box.gray  { border-color: var(--gray-400); background: var(--gray-100); color: var(--gray-600); }
+    .arch-box small { display: block; font-weight: 400; font-size: .72rem; opacity: .75; margin-top: 2px; }
+    .arch-arrow { font-size: 1.2rem; color: var(--gray-400); line-height: 1; }
+    .arch-down  { font-size: 1.5rem; color: var(--gray-400); margin: 4px 0; text-align: center; }
+    .arch-parallel { display: flex; gap: 12px; align-items: center; justify-content: center; }
+    .arch-bracket {
+      display: flex; flex-direction: column; align-items: center;
+      border-left: 2px dashed var(--gray-300); border-right: 2px dashed var(--gray-300);
+      border-bottom: 2px dashed var(--gray-300);
+      padding: 12px 20px; border-radius: 0 0 var(--radius) var(--radius);
+      gap: 8px;
+    }
+    .arch-bracket-label {
+      font-size: .7rem; color: var(--gray-400); text-transform: uppercase;
+      letter-spacing: .08em; font-weight: 600; margin-bottom: 4px;
+    }
+
+    /* ── Tech table ── */
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    thead th {
+      text-align: left; padding: 10px 14px;
+      background: var(--gray-100); color: var(--gray-600);
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    tbody tr { border-bottom: 1px solid var(--gray-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 12px 14px; vertical-align: top; }
+    td:first-child { font-weight: 600; color: var(--gray-800); white-space: nowrap; }
+    td:nth-child(2) { color: var(--blue); font-weight: 600; font-family: monospace; font-size: .82rem; }
+    td:nth-child(3) { color: var(--gray-600); }
+
+    /* ── Phase cards ── */
+    .phase { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
+    .phase-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .phase-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .85rem; flex-shrink: 0;
+    }
+    .phase-name { font-weight: 700; font-size: 1rem; }
+    .phase-tag  {
+      margin-left: auto; font-size: .7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+    }
+    .tag-done    { background: var(--green-lt);  color: var(--green); }
+    .tag-next    { background: var(--blue-lt);   color: var(--blue); }
+    .tag-planned { background: var(--gray-100);  color: var(--gray-600); }
+    .phase-body  { padding: 16px 20px; }
+    .phase-tasks { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .phase-tasks li {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: .85rem; color: var(--gray-700);
+    }
+    .check { font-size: .9rem; flex-shrink: 0; margin-top: 1px; }
+    .check.done { color: var(--green); }
+    .check.todo { color: var(--gray-400); }
+
+    /* ── API endpoints ── */
+    .endpoint { display: flex; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+    .endpoint:last-child { border-bottom: none; }
+    .method {
+      font-family: monospace; font-size: .7rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 5px; white-space: nowrap; flex-shrink: 0;
+    }
+    .method-post   { background: #dcfce7; color: #15803d; }
+    .method-get    { background: #dbeafe; color: #1d4ed8; }
+    .method-patch  { background: #fef3c7; color: #b45309; }
+    .ep-path { font-family: monospace; font-size: .82rem; color: var(--gray-800); font-weight: 600; }
+    .ep-desc { font-size: .8rem; color: var(--gray-400); margin-left: auto; text-align: right; }
+
+    /* ── Intake paths ── */
+    .intake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .intake-grid { grid-template-columns: 1fr; } }
+    .intake-path { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px; }
+    .intake-path h4 { font-size: .9rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .step {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: .8rem; color: var(--gray-600); margin-bottom: 8px;
+    }
+    .step-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── UI preview ── */
+    .ui-mockup {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+      overflow: hidden; font-size: .8rem;
+    }
+    .ui-header {
+      background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .ui-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .ui-body { display: grid; grid-template-columns: 1fr 1fr; }
+    .ui-panel { padding: 16px; border-right: 1px solid var(--gray-100); }
+    .ui-panel:last-child { border-right: none; }
+    .ui-panel h5 { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); font-weight: 700; margin-bottom: 10px; }
+    .ui-field { background: var(--gray-100); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; color: var(--gray-600); font-size: .75rem; }
+    .ui-actions { padding: 12px 16px; background: var(--gray-50); border-top: 1px solid var(--gray-200); display: flex; flex-wrap: wrap; gap: 6px; }
+    .ui-btn {
+      padding: 5px 12px; border-radius: 6px; font-size: .72rem; font-weight: 600;
+      display: inline-block;
+    }
+    .ui-btn-primary { background: #2563eb; color: #fff; }
+    .ui-btn-green   { background: #16a34a; color: #fff; }
+    .ui-btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .chat-bubble { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; font-size: .75rem; }
+    .chat-user { background: var(--blue); color: #fff; margin-left: 20px; }
+    .chat-ai   { background: var(--gray-100); color: var(--gray-700); }
+    .suggested-edit {
+      border: 1px solid #93c5fd; background: #eff6ff; border-radius: 6px;
+      padding: 6px 8px; margin-top: 4px; font-size: .72rem; color: #1e40af;
+    }
+
+    /* ── Plugin diagram ── */
+    .plugin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 640px) { .plugin-grid { grid-template-columns: 1fr; } }
+    .plugin-col { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
+    .plugin-col-header {
+      padding: 10px 14px; font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .plugin-col-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+    .plugin-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .8rem; padding: 6px 8px; border-radius: 6px;
+    }
+    .plugin-item .pi-icon { font-size: 1rem; }
+    .plugin-item .pi-name { font-weight: 600; }
+    .plugin-item .pi-sub  { font-size: .7rem; color: var(--gray-400); }
+    .badge-done { background: var(--green-lt); }
+    .badge-p2   { background: var(--blue-lt); }
+    .badge-p3   { background: var(--amber-lt); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 32px 24px;
+      font-size: .8rem; color: var(--gray-400);
+      border-top: 1px solid var(--gray-200);
+    }
+    footer strong { color: var(--gray-600); }
+
+    /* ── Misc ── */
+    .tag-inline {
+      display: inline-block; font-size: .68rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; text-transform: uppercase;
+      letter-spacing: .04em; vertical-align: middle;
+    }
+    .highlight-box {
+      background: var(--blue-lt); border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px; font-size: .875rem; color: #1e3a8a;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <div class="hero-badge">Project Report · May 2026</div>
+  <h1>Prism</h1>
+  <p>An AI-powered incident analysis platform that eliminates manual triage — ingesting logs, defects, and code signals to deliver a synthesized root-cause report with one-click actions.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><div class="val">Python 3.12</div><div class="lbl">Language</div></div>
+    <div class="hero-meta-item"><div class="val">LangGraph</div><div class="lbl">Agent Framework</div></div>
+    <div class="hero-meta-item"><div class="val">Claude Sonnet</div><div class="lbl">LLM</div></div>
+    <div class="hero-meta-item"><div class="val">4 Phases</div><div class="lbl">Roadmap</div></div>
+    <div class="hero-meta-item"><div class="val">100 concurrent</div><div class="lbl">Target Scale</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════ PROBLEM ══════════ -->
+  <div class="section">
+    <div class="section-label">Context</div>
+    <div class="section-title">The Problem</div>
+    <div class="section-sub">Product engineers lose hours per incident manually collecting and correlating data before any analysis begins.</div>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-icon" style="background:#fee2e2">⏱️</div>
+        <div class="card-title">Manual Correlation</div>
+        <div class="card-body">Engineers manually pull logs from Splunk/Datadog, cross-reference Jira defects, and read code before writing any analysis.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#fef3c7">🔍</div>
+        <div class="card-title">Inconsistent Quality</div>
+        <div class="card-body">Analysis quality varies by engineer experience. Junior engineers miss signals that experienced ones would catch.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#dbeafe">📤</div>
+        <div class="card-title">Sharing Overhead</div>
+        <div class="card-body">Formatting analysis for different audiences (engineering, leadership, customers) requires re-writing the same content multiple times.</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Goal:</strong> Given an incident description and metadata, automatically query the right sources in parallel, synthesize findings into a structured report, and deliver it to the engineer with options to chat, edit, approve, and share — all from one UI.
+    </div>
+  </div>
+
+  <!-- ══════════ ARCHITECTURE ══════════ -->
+  <div class="section">
+    <div class="section-label">Design</div>
+    <div class="section-title">System Architecture</div>
+    <div class="section-sub">Two intake paths converge on a single async pipeline. FastAPI + Celery keep the HTTP layer non-blocking. LangGraph manages the agent state machine.</div>
+
+    <div class="arch-wrap">
+      <div class="arch">
+
+        <!-- Row 1: two intake paths -->
+        <div class="arch-row">
+          <div class="arch-box blue">
+            🖥️ UI Form
+            <small>Manual submission</small>
+          </div>
+          <div class="arch-arrow">────</div>
+          <div class="arch-box green">
+            ⚡ Webhook
+            <small>Jira · Salesforce · Generic</small>
+          </div>
+        </div>
+
+        <div class="arch-down">↓ &nbsp; ↓</div>
+
+        <!-- Row 2: FastAPI -->
+        <div class="arch-row">
+          <div class="arch-box blue" style="min-width:260px">
+            🚀 FastAPI Gateway
+            <small>REST + SSE · Validates HMAC · Enqueues job</small>
+          </div>
+        </div>
+
+        <div class="arch-down">↓</div>
+
+        <!-- Row 3: Celery -->
+        <div class="arch-row">
+          <div class="arch-box amber" style="min-width:260px">
+            ⚙️ Celery Worker Pool
+            <small>Redis broker · max concurrency = 100</small>
+          </div>
+        </div>
+
+        <div class="arch-down">↓</div>
+
+        <!-- Row 4: Orchestrator -->
+        <div class="arch-row">
+          <div class="arch-box blue" style="min-width:280px">
+            🧠 Orchestrator Agent
+            <small>LangGraph StateGraph · route_decision → fan-out</small>
+          </div>
+        </div>
+
+        <div class="arch-down">↓ (parallel Send API)</div>
+
+        <!-- Row 5: parallel sub-agents -->
+        <div class="arch-row">
+          <div class="arch-parallel">
+            <div class="arch-box green">📋 Log Agent<small>Bundle · Splunk · Datadog</small></div>
+            <div class="arch-box green">💻 Code Agent<small>Git / repo (Phase 2)</small></div>
+            <div class="arch-box green">🐛 Defect Agent<small>Jira · Salesforce (Phase 2)</small></div>
+          </div>
+        </div>
+
+        <div class="arch-down">↓ (results merged)</div>
+
+        <!-- Row 6: synthesizer -->
+        <div class="arch-row">
+          <div class="arch-box blue" style="min-width:280px">
+            ✨ Synthesizer Agent
+            <small>Root cause · Workaround · Actions · Confidence score</small>
+          </div>
+        </div>
+
+        <div class="arch-down">↓</div>
+
+        <!-- Row 7: output layer -->
+        <div class="arch-row">
+          <div class="arch-parallel" style="flex-wrap:wrap;gap:8px;justify-content:center">
+            <div class="arch-box gray">📄 Report UI<small>React + Chat</small></div>
+            <div class="arch-box gray">🔔 Notify<small>Slack · Email · Webex</small></div>
+            <div class="arch-box gray">📥 Export<small>PDF · PPT</small></div>
+            <div class="arch-box gray">🔧 Execute<small>Workaround</small></div>
+          </div>
+        </div>
+
+        <div class="arch-down">↓ (on-demand, post-closure)</div>
+
+        <!-- Row 8: evaluator -->
+        <div class="arch-row">
+          <div class="arch-box gray" style="min-width:260px">
+            🔬 Evaluator Agent
+            <small>Scores analysis · Improves future prompts (Phase 4)</small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ INTAKE PATHS ══════════ -->
+  <div class="section">
+    <div class="section-label">Flows</div>
+    <div class="section-title">Incident Intake</div>
+    <div class="section-sub">Engineers can submit manually via the UI, or incidents can be auto-ingested from Jira and other systems via webhooks.</div>
+
+    <div class="intake-grid">
+      <div class="intake-path">
+        <h4>🖥️ Path A — Manual (UI Form)</h4>
+        <div class="step"><div class="step-num">1</div>Engineer fills title, description, severity, metadata</div>
+        <div class="step"><div class="step-num">2</div>POST /api/analysis → immediate job_id response</div>
+        <div class="step"><div class="step-num">3</div>Browser polls every 3s while analysis runs</div>
+        <div class="step"><div class="step-num">4</div>Report appears in UI on completion</div>
+      </div>
+      <div class="intake-path">
+        <h4>⚡ Path B — Automatic (Webhook)</h4>
+        <div class="step"><div class="step-num">1</div>Jira creates/transitions a ticket matching trigger rules</div>
+        <div class="step"><div class="step-num">2</div>Jira fires webhook → HMAC validated</div>
+        <div class="step"><div class="step-num">3</div>Adapter maps payload to Incident model → Celery task</div>
+        <div class="step"><div class="step-num">4</div>Slack/email sent with link: <code style="font-size:.75rem">/analysis/{id}</code></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 16px;background:var(--gray-100);border-radius:var(--radius);font-size:.82rem;color:var(--gray-600)">
+      <strong>Trigger rules</strong> are config-driven in <code>config.yaml</code> — only specific issue types, priorities, and project keys fire analysis, preventing noise from low-priority tickets.
+    </div>
+  </div>
+
+  <!-- ══════════ TECH STACK ══════════ -->
+  <div class="section">
+    <div class="section-label">Technology</div>
+    <div class="section-title">Tech Stack</div>
+    <div class="section-sub">Every choice optimizes for pluggability and portability — swap any integration without touching core pipeline logic.</div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Concern</th><th>Choice</th><th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>LLM</td><td>claude-sonnet-4-6</td><td>200K context handles large log bundles; best-in-class reasoning; structured output</td></tr>
+          <tr><td>Agent Framework</td><td>LangGraph</td><td>Native parallel fan-out (Send API); typed state machine; Postgres checkpointer for resume/re-run; interrupt node for approval gates</td></tr>
+          <tr><td>API</td><td>FastAPI + uvicorn</td><td>Async-native; SSE for chat streaming; OpenAPI docs auto-generated</td></tr>
+          <tr><td>Task Queue</td><td>Celery + Redis</td><td>Decouples HTTP from 5–15 min pipeline; enforces 100-concurrent ceiling at worker level</td></tr>
+          <tr><td>UI</td><td>React + Vite + TypeScript</td><td>FastAPI serves the built SPA — single container, portable anywhere; shadcn/ui + Tailwind for components</td></tr>
+          <tr><td>Database</td><td>PostgreSQL + SQLAlchemy + Alembic</td><td>Stores incidents, analysis versions, chat history, token metrics, audit log</td></tr>
+          <tr><td>Vector Store</td><td>ChromaDB / Qdrant</td><td>RAG over runbooks and code docs; swap via adapter</td></tr>
+          <tr><td>PDF Export</td><td>WeasyPrint + Jinja2</td><td>HTML → PDF with full CSS/branding; clean for both technical and executive templates</td></tr>
+          <tr><td>PPT Export</td><td>python-pptx</td><td>Programmatic slide generation from report data; two audience templates</td></tr>
+          <tr><td>Packaging</td><td>uv + pyproject.toml</td><td>Fast, reproducible; single command install</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════ KEY FEATURES ══════════ -->
+  <div class="section">
+    <div class="section-label">Features</div>
+    <div class="section-title">Key Capabilities</div>
+    <div class="section-sub">Beyond automated analysis — the system supports a full engineer review workflow with AI collaboration.</div>
+
+    <div class="card-grid card-grid-2">
+
+      <div class="card">
+        <div class="card-icon" style="background:#ede9fe">🤖</div>
+        <div class="card-title">Multi-Agent Analysis Pipeline</div>
+        <div class="card-body">Orchestrator LLM decides which agents to activate based on incident type. Log, code, and defect agents run in parallel and return structured findings. Synthesizer produces root cause, workaround, and prioritized actions.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" style="background:#dcfce7">💬</div>
+        <div class="card-title">Chat with AI for Clarifications</div>
+        <div class="card-body">Engineers can ask follow-up questions on any finding. The AI has full context — incident, raw sub-agent data, and current report. Responses stream in real time via SSE. AI can suggest direct edits to report fields (accept/dismiss).</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" style="background:#fef3c7">📝</div>
+        <div class="card-title">Analysis Versioning</div>
+        <div class="card-body">Every edit (manual or chat-suggested) creates a new version. Original AI output (v0) is never overwritten. Version history with diffs is visible in the UI. Share and export always use the latest approved version.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" style="background:#fee2e2">📊</div>
+        <div class="card-title">Multi-Audience Export</div>
+        <div class="card-body">Four export templates: PDF Technical (full analysis + log references), PDF Executive (plain-language summary), PPT Executive (5-slide leadership deck), PPT Customer (incident report for external sharing).</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" style="background:#dbeafe">🔌</div>
+        <div class="card-title">Pluggable Adapters</div>
+        <div class="card-body">Every external system is behind an abstract base class. Add Splunk, Datadog, Salesforce, or any other source by subclassing one file and adding a config.yaml entry — no changes to the pipeline.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon" style="background:#d1fae5">📈</div>
+        <div class="card-title">Token Usage Tracking</div>
+        <div class="card-body">Every analysis records per-agent token usage and estimated cost. Aggregated trends identify which agents are most expensive over time, enabling targeted prompt optimization.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ PLUGIN MAP ══════════ -->
+  <div class="section">
+    <div class="section-label">Integrations</div>
+    <div class="section-title">Pluggable Adapter Map</div>
+    <div class="section-sub">Every integration is a one-file subclass. Phase-1 adapters are fully implemented. Phase-2 adapters are stubbed and ready to fill.</div>
+
+    <div class="plugin-grid">
+      <div class="plugin-col">
+        <div class="plugin-col-header" style="background:#dcfce7;color:#14532d">📂 Data Sources</div>
+        <div class="plugin-col-body">
+          <div class="plugin-item badge-done">
+            <span class="pi-icon">📦</span>
+            <div><div class="pi-name">Log Bundle</div><div class="pi-sub">ZIP / directory · Phase 1 ✓</div></div>
+          </div>
+          <div class="plugin-item badge-p2">
+            <span class="pi-icon">🔍</span>
+            <div><div class="pi-name">Splunk</div><div class="pi-sub">REST API · Phase 2</div></div>
+          </div>
+          <div class="plugin-item badge-p2">
+            <span class="pi-icon">🐕</span>
+            <div><div class="pi-name">Datadog</div><div class="pi-sub">Logs API · Phase 2</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plugin-col">
+        <div class="plugin-col-header" style="background:#dbeafe;color:#1e40af">🎫 Incident Systems</div>
+        <div class="plugin-col-body">
+          <div class="plugin-item badge-done">
+            <span class="pi-icon">📋</span>
+            <div><div class="pi-name">Jira</div><div class="pi-sub">Webhook + Polling · Phase 1 ✓</div></div>
+          </div>
+          <div class="plugin-item badge-p2">
+            <span class="pi-icon">☁️</span>
+            <div><div class="pi-name">Salesforce</div><div class="pi-sub">Case events · Phase 2</div></div>
+          </div>
+          <div class="plugin-item badge-p2">
+            <span class="pi-icon">🔗</span>
+            <div><div class="pi-name">Generic Webhook</div><div class="pi-sub">Standard payload · Phase 1 ✓</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plugin-col">
+        <div class="plugin-col-header" style="background:#fef3c7;color:#92400e">🔔 Notifications</div>
+        <div class="plugin-col-body">
+          <div class="plugin-item badge-done">
+            <span class="pi-icon">💬</span>
+            <div><div class="pi-name">Slack</div><div class="pi-sub">Bot + rich blocks · Phase 1 ✓</div></div>
+          </div>
+          <div class="plugin-item badge-p3">
+            <span class="pi-icon">📧</span>
+            <div><div class="pi-name">Email</div><div class="pi-sub">SendGrid · Phase 3</div></div>
+          </div>
+          <div class="plugin-item badge-p3">
+            <span class="pi-icon">🟢</span>
+            <div><div class="pi-name">Webex</div><div class="pi-sub">Bot API · Phase 3</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ UI MOCKUP ══════════ -->
+  <div class="section">
+    <div class="section-label">User Experience</div>
+    <div class="section-title">Review Interface</div>
+    <div class="section-sub">Engineers open the link from Slack or navigate directly. They see the report and a live chat panel side-by-side. Actions are pinned to the bottom bar.</div>
+
+    <div class="ui-mockup">
+      <div class="ui-header">
+        <div class="dot" style="background:#ef4444"></div>
+        <div class="dot" style="background:#f59e0b"></div>
+        <div class="dot" style="background:#22c55e"></div>
+        <span style="margin-left:10px;font-size:.75rem;color:var(--gray-400)">
+          INC-4821 · P1 · Payment service timeout · via Jira &nbsp;|&nbsp; Analysis complete · 87% confidence
+        </span>
+      </div>
+
+      <div class="ui-body">
+        <!-- Left panel: report -->
+        <div class="ui-panel">
+          <h5>Analysis Report &nbsp; <span style="color:var(--blue);cursor:pointer">Edit</span></h5>
+
+          <div style="font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Root Cause</div>
+          <div class="ui-field">Downstream timeout in the payment gateway adapter caused by a misconfigured connection pool size (max=5) under peak load. Circuit breaker tripped at 14:32 UTC.</div>
+
+          <div style="font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px">Workaround</div>
+          <div class="ui-field">Increase <code>PAYMENT_POOL_MAX=20</code> in environment config and redeploy. Monitor p99 latency for 15 min after.</div>
+
+          <div style="font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px">Actions</div>
+          <div class="ui-field" style="color:var(--gray-700)"><span style="background:#fee2e2;color:#b91c1c;font-size:.68rem;padding:1px 6px;border-radius:4px;font-weight:700">HIGH</span> &nbsp;Fix pool config in helm chart</div>
+          <div class="ui-field" style="color:var(--gray-700)"><span style="background:#fef3c7;color:#b45309;font-size:.68rem;padding:1px 6px;border-radius:4px;font-weight:700">MED</span> &nbsp;Add circuit breaker alert to Datadog</div>
+
+          <div style="margin-top:10px;font-size:.7rem;color:var(--gray-400)">
+            Version: <span style="color:var(--blue)">v1 (you, 5m ago)</span> · v0 (AI original) · <span style="color:var(--blue)">View diff</span>
+          </div>
+        </div>
+
+        <!-- Right panel: chat -->
+        <div class="ui-panel">
+          <h5>Chat with AI</h5>
+          <div class="chat-bubble chat-user">Why did you rule out a DB connection pool issue?</div>
+          <div class="chat-bubble chat-ai">
+            DB pool utilization peaked at 42% — well under capacity. The bottleneck was specifically in the <code>PaymentGatewayClient</code> HTTP pool, not the database layer.
+            <div class="suggested-edit">
+              <strong>Suggested edit to root_cause:</strong><br/>
+              "...misconfigured HTTP connection pool in PaymentGatewayClient (not DB layer)..."
+              <div style="margin-top:4px;display:flex;gap:6px">
+                <span class="ui-btn ui-btn-primary" style="font-size:.65rem;padding:2px 8px">Apply</span>
+                <span style="font-size:.65rem;color:var(--gray-400);cursor:pointer">Dismiss</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <div style="flex:1;background:var(--gray-100);border-radius:6px;padding:7px 10px;font-size:.75rem;color:var(--gray-400)">Ask a question...</div>
+            <span class="ui-btn ui-btn-primary" style="font-size:.72rem">Send</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui-actions">
+        <span class="ui-btn ui-btn-green">Execute Workaround</span>
+        <span class="ui-btn ui-btn-outline">Slack</span>
+        <span class="ui-btn ui-btn-outline">Email</span>
+        <span class="ui-btn ui-btn-outline">PDF Technical</span>
+        <span class="ui-btn ui-btn-outline">PDF Executive</span>
+        <span class="ui-btn ui-btn-outline">PPT Executive</span>
+        <span class="ui-btn ui-btn-outline">PPT Customer</span>
+        <span class="ui-btn ui-btn-outline">Re-run</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ API ══════════ -->
+  <div class="section">
+    <div class="section-label">API</div>
+    <div class="section-title">REST Endpoints</div>
+    <div class="section-sub">All routes are served by FastAPI. The React SPA is served from the same process as static files.</div>
+
+    <div class="card" style="padding: 8px 16px">
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/api/analysis</span>
+        <span class="ep-desc">Submit incident (manual path)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="ep-path">/api/analysis/{id}</span>
+        <span class="ep-desc">Status + current report version</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-patch">PATCH</span>
+        <span class="ep-path">/api/analysis/{id}</span>
+        <span class="ep-desc">Save edited version</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="ep-path">/api/analysis/{id}/versions</span>
+        <span class="ep-desc">All versions with diff data</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/api/analysis/{id}/chat</span>
+        <span class="ep-desc">Send message → SSE stream response</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="ep-path">/api/analysis/{id}/chat</span>
+        <span class="ep-desc">Full conversation history</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/api/analysis/{id}/export</span>
+        <span class="ep-desc">Generate PDF or PPTX download</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/api/analysis/{id}/action</span>
+        <span class="ep-desc">Execute workaround / share / notify</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/webhooks/jira</span>
+        <span class="ep-desc">Jira webhook intake (HMAC validated)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/webhooks/salesforce</span>
+        <span class="ep-desc">Salesforce case event intake</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="ep-path">/webhooks/generic</span>
+        <span class="ep-desc">Standard payload for any other system</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PHASES ══════════ -->
+  <div class="section">
+    <div class="section-label">Roadmap</div>
+    <div class="section-title">Implementation Phases</div>
+    <div class="section-sub">Phase 1 is scaffolded and ready for end-to-end testing. Phases 2–4 build on the same adapter and agent patterns.</div>
+
+    <div class="card-grid" style="grid-template-columns:1fr;gap:16px">
+
+      <div class="phase">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#dcfce7;color:#16a34a">1</div>
+          <div class="phase-name">Core Pipeline (PoC)</div>
+          <span class="phase-tag tag-done">✓ Scaffolded</span>
+        </div>
+        <div class="phase-body">
+          <ul class="phase-tasks">
+            <li><span class="check done">✓</span> Project scaffold — pyproject.toml, docker-compose, Dockerfile, config.yaml</li>
+            <li><span class="check done">✓</span> Core modules — config, database, token tracker</li>
+            <li><span class="check done">✓</span> Data models + Alembic migrations — incidents, reports, versions, chat, metrics</li>
+            <li><span class="check done">✓</span> Adapter base classes + LogBundleAdapter</li>
+            <li><span class="check done">✓</span> LangGraph orchestrator → log_agent → synthesizer</li>
+            <li><span class="check done">✓</span> FastAPI — all 11 route endpoints</li>
+            <li><span class="check done">✓</span> Celery worker with notification callback</li>
+            <li><span class="check done">✓</span> React UI — IncidentForm, ReportViewer, ChatPanel, ActionBar, VersionHistory</li>
+            <li><span class="check done">✓</span> Jira webhook adapter + trigger rules</li>
+            <li><span class="check done">✓</span> Slack notification adapter</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#dbeafe;color:#2563eb">2</div>
+          <div class="phase-name">Pluggable Adapters, Chat & Export</div>
+          <span class="phase-tag tag-next">Next</span>
+        </div>
+        <div class="phase-body">
+          <ul class="phase-tasks">
+            <li><span class="check todo">○</span> SplunkAdapter, DatadogAdapter</li>
+            <li><span class="check todo">○</span> Jira full implementation + SalesforceAdapter</li>
+            <li><span class="check todo">○</span> CodeAnalystAgent (git/repo traversal)</li>
+            <li><span class="check todo">○</span> DefectAnalystAgent</li>
+            <li><span class="check todo">○</span> Chat suggested-edit apply/dismiss wired end-to-end</li>
+            <li><span class="check todo">○</span> Version diff view in UI</li>
+            <li><span class="check todo">○</span> Full PDF templates (technical + executive) with Jinja2</li>
+            <li><span class="check todo">○</span> Full PPT templates (executive + customer)</li>
+            <li><span class="check todo">○</span> Re-run from LangGraph checkpoint</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#fef3c7;color:#d97706">3</div>
+          <div class="phase-name">Actions, Notifications & Metrics</div>
+          <span class="phase-tag tag-planned">Planned</span>
+        </div>
+        <div class="phase-body">
+          <ul class="phase-tasks">
+            <li><span class="check todo">○</span> Email (SendGrid) + Webex notification adapters</li>
+            <li><span class="check todo">○</span> Workaround execution with LangGraph approval gate (interrupt node)</li>
+            <li><span class="check todo">○</span> Action audit log UI</li>
+            <li><span class="check todo">○</span> Token usage dashboard — per-analysis + aggregate trends</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-header">
+          <div class="phase-num" style="background:var(--gray-100);color:var(--gray-600)">4</div>
+          <div class="phase-name">Evaluation Agent & Scale</div>
+          <span class="phase-tag tag-planned">Planned</span>
+        </div>
+        <div class="phase-body">
+          <ul class="phase-tasks">
+            <li><span class="check todo">○</span> EvaluatorAgent — on-demand post-closure analysis scoring</li>
+            <li><span class="check todo">○</span> Prompt improvement report generation</li>
+            <li><span class="check todo">○</span> Load test: 100 concurrent analyses</li>
+            <li><span class="check todo">○</span> Cloud / Hugging Face Spaces deployment config</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ RUNNING IT ══════════ -->
+  <div class="section">
+    <div class="section-label">Getting Started</div>
+    <div class="section-title">Running the Project</div>
+    <div class="section-sub">One docker-compose command starts the full backend. The React dev server proxies API calls automatically.</div>
+
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">🐳 Docker (recommended)</div>
+        <pre style="background:var(--gray-900);color:#e2e8f0;border-radius:8px;padding:16px;font-size:.78rem;overflow-x:auto;line-height:1.7"><code>cp .env.example .env
+# Set ANTHROPIC_API_KEY in .env
+
+docker-compose up -d
+# Starts: Postgres · Redis · API · Celery
+
+cd ui &amp;&amp; npm install
+npm run dev
+# UI on :5173 · API on :8000</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">🛠️ Local Dev</div>
+        <pre style="background:var(--gray-900);color:#e2e8f0;border-radius:8px;padding:16px;font-size:.78rem;overflow-x:auto;line-height:1.7"><code>uv pip install -e ".[dev]"
+
+# Run API
+uvicorn src.api.main:app --reload
+
+# Run worker (separate terminal)
+celery -A src.api.worker.celery_app \
+  worker --loglevel=info
+
+# Migrations
+alembic upgrade head</code></pre>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  Generated &nbsp;·&nbsp; <strong>Prism</strong> &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Phase 1 Complete
+</footer>
+
+</body>
+</html>

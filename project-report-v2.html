@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Project Overview</title>
+  <style>
+    :root {
+      --blue:    #2563eb;
+      --blue-dk: #1e40af;
+      --blue-lt: #dbeafe;
+      --green:   #16a34a;
+      --green-lt:#dcfce7;
+      --amber:   #d97706;
+      --amber-lt:#fef3c7;
+      --purple:  #7c3aed;
+      --purple-lt:#ede9fe;
+      --rose:    #e11d48;
+      --rose-lt: #ffe4e6;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-400:#9ca3af;
+      --gray-500:#6b7280;
+      --gray-600:#4b5563;
+      --gray-700:#374151;
+      --gray-800:#1f2937;
+      --gray-900:#111827;
+      --radius:  12px;
+      --shadow:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #f0f4f8;
+      color: var(--gray-800);
+      line-height: 1.65;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(140deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
+      color: #fff;
+      padding: 64px 40px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-inner { max-width: 1060px; margin: 0 auto; position: relative; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; padding: 5px 14px; margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; letter-spacing: -.03em;
+      line-height: 1.1; margin-bottom: 16px;
+    }
+    .hero h1 span { color: #93c5fd; }
+    .hero p { font-size: 1.1rem; opacity: .8; max-width: 600px; margin-bottom: 40px; }
+
+    .hero-stats {
+      display: flex; gap: 0; flex-wrap: wrap;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius); overflow: hidden;
+      width: fit-content;
+    }
+    .hero-stat {
+      padding: 16px 28px; text-align: center;
+      border-right: 1px solid rgba(255,255,255,.1);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat .val { font-size: 1.35rem; font-weight: 800; line-height: 1; }
+    .hero-stat .lbl { font-size: .68rem; opacity: .6; text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+
+    /* ── Layout ── */
+    .container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 56px 0; }
+    .section + .section { border-top: 1px solid var(--gray-200); }
+
+    .section-eyebrow {
+      font-size: .68rem; font-weight: 800; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .section-eyebrow::after {
+      content: ''; flex: 1; max-width: 40px; height: 2px;
+      background: var(--blue); border-radius: 2px; opacity: .4;
+    }
+    .section-title { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); margin-bottom: 8px; letter-spacing: -.02em; }
+    .section-sub   { color: var(--gray-500); margin-bottom: 36px; max-width: 580px; font-size: .95rem; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 14px;
+    }
+    .card h3 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: var(--gray-900); }
+    .card p  { font-size: .845rem; color: var(--gray-500); line-height: 1.6; }
+
+    /* ── Architecture ── */
+    .arch-canvas {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+      padding: 40px 32px; box-shadow: var(--shadow); overflow-x: auto;
+    }
+    .arch { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 560px; }
+    .arch-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+    .arch-node {
+      border-radius: 10px; padding: 11px 18px; text-align: center;
+      font-size: .78rem; font-weight: 700; min-width: 120px;
+      border: 2px solid transparent; line-height: 1.3;
+    }
+    .arch-node small { display: block; font-weight: 400; font-size: .7rem; opacity: .7; margin-top: 3px; }
+    .n-blue   { background: var(--blue-lt);   border-color: #93c5fd; color: var(--blue-dk); }
+    .n-green  { background: var(--green-lt);  border-color: #86efac; color: #14532d; }
+    .n-amber  { background: var(--amber-lt);  border-color: #fcd34d; color: #78350f; }
+    .n-purple { background: var(--purple-lt); border-color: #c4b5fd; color: #4c1d95; }
+    .n-gray   { background: var(--gray-100);  border-color: var(--gray-300); color: var(--gray-600); }
+    .arch-arrow { color: var(--gray-300); font-size: 1.1rem; flex-shrink: 0; }
+    .arch-down  { color: var(--gray-300); font-size: 1.4rem; margin: 3px 0; text-align: center; }
+    .arch-label { font-size: .64rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; margin: 2px 0 6px; }
+
+    /* ── Tech table ── */
+    .table-wrap { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; font-size: .855rem; }
+    thead th {
+      text-align: left; padding: 11px 16px;
+      background: var(--gray-50); color: var(--gray-500);
+      font-size: .67rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    tbody tr { border-bottom: 1px solid var(--gray-100); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--gray-50); }
+    tbody td { padding: 12px 16px; vertical-align: top; }
+    .td-concern { font-weight: 700; color: var(--gray-800); white-space: nowrap; }
+    .td-choice  { font-family: "SF Mono", "Fira Code", monospace; font-size: .8rem; color: var(--blue); font-weight: 600; white-space: nowrap; }
+    .td-reason  { color: var(--gray-500); font-size: .83rem; }
+    .provider-tag {
+      display: inline-block; font-size: .64rem; font-weight: 700;
+      padding: 1px 6px; border-radius: 4px; margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ── LLM config section ── */
+    .llm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 680px) { .llm-grid { grid-template-columns: 1fr; } }
+    .provider-card {
+      background: #fff; border: 2px solid var(--gray-200); border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow); transition: border-color .15s;
+    }
+    .provider-card.active { border-color: var(--blue); }
+    .provider-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .provider-logo { font-size: 1.5rem; }
+    .provider-name { font-weight: 800; font-size: .95rem; }
+    .provider-default { font-size: .65rem; background: var(--blue-lt); color: var(--blue); padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .provider-models { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .model-pill {
+      font-family: monospace; font-size: .72rem;
+      background: var(--gray-100); color: var(--gray-700);
+      padding: 2px 8px; border-radius: 4px; border: 1px solid var(--gray-200);
+    }
+    .env-snippet {
+      background: var(--gray-900); border-radius: 8px;
+      padding: 10px 14px; font-family: monospace; font-size: .75rem;
+      color: #e2e8f0; line-height: 1.7;
+    }
+    .env-key   { color: #93c5fd; }
+    .env-val   { color: #86efac; }
+    .env-comment { color: #64748b; }
+
+    /* ── Adapter grid ── */
+    .adapter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 680px) { .adapter-grid { grid-template-columns: 1fr; } }
+    .adapter-col { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+    .adapter-header { padding: 12px 16px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--gray-100); }
+    .adapter-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .adapter-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
+    .adapter-item .ai  { font-size: 1.1rem; }
+    .adapter-item .an  { font-weight: 700; font-size: .83rem; }
+    .adapter-item .as  { font-size: .7rem; color: var(--gray-400); margin-top: 1px; }
+    .a-done { background: var(--green-lt); }
+    .a-p2   { background: var(--blue-lt); }
+    .a-p3   { background: var(--amber-lt); }
+
+    /* ── Intake paths ── */
+    .intake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 640px) { .intake-grid { grid-template-columns: 1fr; } }
+    .intake-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+    .intake-card h4 { font-weight: 800; margin-bottom: 14px; font-size: .9rem; display: flex; align-items: center; gap: 8px; }
+    .step { display: flex; gap: 10px; font-size: .82rem; color: var(--gray-600); margin-bottom: 9px; }
+    .step-num {
+      width: 21px; height: 21px; border-radius: 50%; background: var(--blue); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .64rem; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── UI Mockup ── */
+    .mockup {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+      overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+    .mockup-bar {
+      background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+      padding: 10px 16px; display: flex; align-items: center; gap: 7px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-url { font-size: .72rem; color: var(--gray-400); margin-left: 8px; font-family: monospace; }
+    .mockup-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 340px; }
+    .mockup-panel { padding: 18px; }
+    .mockup-panel + .mockup-panel { border-left: 1px solid var(--gray-100); }
+    .mp-label { font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .mp-label a { color: var(--blue); font-weight: 700; cursor: pointer; }
+    .mp-field { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 7px; padding: 9px 11px; font-size: .75rem; color: var(--gray-700); margin-bottom: 7px; }
+    .mp-pill { display: inline-block; font-size: .65rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 4px; }
+    .pill-high { background: var(--rose-lt);   color: var(--rose); }
+    .pill-med  { background: var(--amber-lt);  color: var(--amber); }
+    .pill-low  { background: var(--green-lt);  color: var(--green); }
+    .chat-msg { border-radius: 10px; padding: 9px 12px; font-size: .75rem; margin-bottom: 7px; line-height: 1.5; }
+    .cm-user { background: var(--blue); color: #fff; margin-left: 24px; }
+    .cm-ai   { background: var(--gray-100); color: var(--gray-700); }
+    .edit-suggest {
+      border: 1px solid #93c5fd; background: #eff6ff; border-radius: 7px;
+      padding: 7px 9px; margin-top: 5px; font-size: .7rem; color: #1e40af;
+    }
+    .mockup-actions {
+      padding: 12px 18px; background: var(--gray-50); border-top: 1px solid var(--gray-200);
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .btn { padding: 6px 13px; border-radius: 7px; font-size: .72rem; font-weight: 700; display: inline-block; white-space: nowrap; }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-blue    { background: var(--blue);  color: #fff; }
+    .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
+
+    /* ── API endpoints ── */
+    .endpoints { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+    .ep { display: flex; align-items: baseline; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--gray-100); }
+    .ep:last-child { border-bottom: none; }
+    .ep:hover { background: var(--gray-50); }
+    .method {
+      font-family: monospace; font-size: .66rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 5px; flex-shrink: 0; min-width: 48px; text-align: center;
+    }
+    .m-post  { background: #dcfce7; color: #15803d; }
+    .m-get   { background: #dbeafe; color: #1d4ed8; }
+    .m-patch { background: #fef3c7; color: #b45309; }
+    .ep-path { font-family: monospace; font-size: .8rem; font-weight: 600; color: var(--gray-800); }
+    .ep-desc { font-size: .78rem; color: var(--gray-400); margin-left: auto; }
+
+    /* ── Export section ── */
+    .export-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 640px) { .export-grid { grid-template-columns: 1fr; } }
+    .export-card {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow);
+    }
+    .export-card h4 { font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .export-card p  { font-size: .83rem; color: var(--gray-500); margin-bottom: 12px; }
+    .export-slides { display: flex; gap: 6px; flex-wrap: wrap; }
+    .slide-chip {
+      font-size: .7rem; background: var(--gray-100); border: 1px solid var(--gray-200);
+      border-radius: 5px; padding: 3px 8px; color: var(--gray-600); font-weight: 600;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 36px 24px;
+      font-size: .78rem; color: var(--gray-400);
+      background: #fff; border-top: 1px solid var(--gray-200);
+      margin-top: 32px;
+    }
+    footer strong { color: var(--gray-600); }
+
+    .note {
+      background: var(--blue-lt); border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px; font-size: .865rem; color: #1e3a8a; margin-top: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .mockup-body { grid-template-columns: 1fr; }
+      .hero-stats  { width: 100%; }
+      .hero-stat   { flex: 1; padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📋 Project Overview &nbsp;·&nbsp; May 2026</div>
+    <h1>AI<span>Troubleshooting</span></h1>
+    <p>An incident analysis platform that replaces hours of manual triage with an AI pipeline — automatically querying logs, defects, and code, then synthesising a structured report engineers can review, refine, and share.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">Python 3.12</div><div class="lbl">Language</div></div>
+      <div class="hero-stat"><div class="val">LangGraph</div><div class="lbl">Agent Framework</div></div>
+      <div class="hero-stat"><div class="val">Pluggable LLM</div><div class="lbl">Provider</div></div>
+      <div class="hero-stat"><div class="val">100 concurrent</div><div class="lbl">Target Scale</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══ PROBLEM ══ -->
+<div class="section">
+  <div class="section-eyebrow">Context</div>
+  <div class="section-title">The Problem</div>
+  <div class="section-sub">Before any analysis is written, engineers spend hours collecting data manually from disconnected systems.</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon" style="background:#fee2e2">⏱️</div>
+      <h3>Manual Correlation</h3>
+      <p>Engineers pull logs from Splunk or Datadog, cross-reference Jira defects, and read code diffs before writing a single line of analysis.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#fef3c7">📉</div>
+      <h3>Inconsistent Quality</h3>
+      <p>Analysis depth varies by engineer experience. Junior engineers miss signals experienced ones would catch — creating uneven incident response.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--purple-lt)">📤</div>
+      <h3>Sharing Overhead</h3>
+      <p>The same findings get re-written multiple times — once for engineers, once for leadership, once for customers — at a cost of hours per incident.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Goal:</strong> Given an incident and its metadata, automatically query the right data sources in parallel, synthesise findings into a structured report, and let the engineer review, chat, edit, and share — all from one UI.
+  </div>
+</div>
+
+<!-- ══ LLM CONFIG ══ -->
+<div class="section">
+  <div class="section-eyebrow">Configuration</div>
+  <div class="section-title">Configurable LLM Provider</div>
+  <div class="section-sub">The AI provider and model are set entirely via environment variables. No code change is needed to switch between Anthropic, OpenAI, Google, or AWS Bedrock.</div>
+
+  <div class="llm-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px,1fr));margin-bottom:24px">
+
+    <div class="provider-card active">
+      <div class="provider-header">
+        <span class="provider-logo">🟠</span>
+        <span class="provider-name">Anthropic</span>
+        <span class="provider-default">Default</span>
+      </div>
+      <div class="provider-models">
+        <span class="model-pill">claude-sonnet-4-6</span>
+        <span class="model-pill">claude-opus-4-7</span>
+        <span class="model-pill">claude-haiku-4-5</span>
+      </div>
+      <div class="env-snippet">
+<span class="env-key">LLM_PROVIDER</span>=<span class="env-val">anthropic</span>
+<span class="env-key">LLM_MODEL</span>=<span class="env-val">claude-sonnet-4-6</span>
+<span class="env-key">ANTHROPIC_API_KEY</span>=<span class="env-val">sk-ant-...</span></div>
+    </div>
+
+    <div class="provider-card">
+      <div class="provider-header">
+        <span class="provider-logo">🟢</span>
+        <span class="provider-name">OpenAI</span>
+      </div>
+      <div class="provider-models">
+        <span class="model-pill">gpt-4o</span>
+        <span class="model-pill">gpt-4o-mini</span>
+        <span class="model-pill">o3</span>
+      </div>
+      <div class="env-snippet">
+<span class="env-key">LLM_PROVIDER</span>=<span class="env-val">openai</span>
+<span class="env-key">LLM_MODEL</span>=<span class="env-val">gpt-4o</span>
+<span class="env-key">OPENAI_API_KEY</span>=<span class="env-val">sk-...</span></div>
+    </div>
+
+    <div class="provider-card">
+      <div class="provider-header">
+        <span class="provider-logo">🔵</span>
+        <span class="provider-name">Google</span>
+      </div>
+      <div class="provider-models">
+        <span class="model-pill">gemini-1.5-pro</span>
+        <span class="model-pill">gemini-2.0-flash</span>
+      </div>
+      <div class="env-snippet">
+<span class="env-key">LLM_PROVIDER</span>=<span class="env-val">google</span>
+<span class="env-key">LLM_MODEL</span>=<span class="env-val">gemini-1.5-pro</span>
+<span class="env-key">GOOGLE_API_KEY</span>=<span class="env-val">AIza...</span></div>
+    </div>
+
+    <div class="provider-card">
+      <div class="provider-header">
+        <span class="provider-logo">🟡</span>
+        <span class="provider-name">AWS Bedrock</span>
+      </div>
+      <div class="provider-models">
+        <span class="model-pill">anthropic.claude-3-5</span>
+        <span class="model-pill">meta.llama3</span>
+      </div>
+      <div class="env-snippet">
+<span class="env-key">LLM_PROVIDER</span>=<span class="env-val">bedrock</span>
+<span class="env-key">LLM_MODEL</span>=<span class="env-val">anthropic.claude-3-5...</span>
+<span class="env-key">AWS_ACCESS_KEY_ID</span>=<span class="env-val">AKIA...</span>
+<span class="env-key">AWS_REGION</span>=<span class="env-val">us-east-1</span></div>
+    </div>
+
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:14px 18px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);font-size:.75rem;color:var(--gray-500);font-weight:600">
+      Install only the package for your chosen provider
+    </div>
+    <div style="padding:16px 18px">
+      <div class="env-snippet" style="font-size:.8rem;line-height:2">
+<span class="env-comment"># Anthropic (default)</span>
+uv pip install -e ".[<span class="env-val">anthropic</span>]"
+
+<span class="env-comment"># OpenAI</span>
+uv pip install -e ".[<span class="env-val">openai</span>]"
+
+<span class="env-comment"># Google</span>
+uv pip install -e ".[<span class="env-val">google</span>]"
+
+<span class="env-comment"># AWS Bedrock</span>
+uv pip install -e ".[<span class="env-val">bedrock</span>]"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ARCHITECTURE ══ -->
+<div class="section">
+  <div class="section-eyebrow">Design</div>
+  <div class="section-title">System Architecture</div>
+  <div class="section-sub">Two intake paths converge on one async pipeline. FastAPI + Celery keep the API layer non-blocking. LangGraph manages the agent state machine with typed state and parallel fan-out.</div>
+
+  <div class="arch-canvas">
+    <div class="arch">
+
+      <div class="arch-row">
+        <div class="arch-node n-blue">🖥️ UI Form<small>Manual submission</small></div>
+        <div class="arch-arrow">────</div>
+        <div class="arch-node n-green">⚡ Webhook<small>Jira · Salesforce · Generic</small></div>
+      </div>
+      <div class="arch-down">↓ &nbsp; ↓</div>
+
+      <div class="arch-row">
+        <div class="arch-node n-blue" style="min-width:260px">🚀 FastAPI Gateway<small>REST + SSE · HMAC validation · enqueues job</small></div>
+      </div>
+      <div class="arch-down">↓</div>
+
+      <div class="arch-row">
+        <div class="arch-node n-amber" style="min-width:260px">⚙️ Celery Worker Pool<small>Redis broker · max concurrency = 100</small></div>
+      </div>
+      <div class="arch-down">↓</div>
+
+      <div class="arch-row">
+        <div class="arch-node n-blue" style="min-width:280px">🧠 Orchestrator Agent<small>LangGraph StateGraph · decides which agents activate</small></div>
+      </div>
+      <div class="arch-label">parallel fan-out via LangGraph Send API</div>
+
+      <div class="arch-row" style="gap:10px;flex-wrap:wrap;justify-content:center">
+        <div class="arch-node n-green">📋 Log Agent<small>Bundle · Splunk · Datadog</small></div>
+        <div class="arch-node n-green">💻 Code Agent<small>Git / repo analysis</small></div>
+        <div class="arch-node n-green">🐛 Defect Agent<small>Jira · Salesforce</small></div>
+      </div>
+      <div class="arch-down">↓ (results merged)</div>
+
+      <div class="arch-row">
+        <div class="arch-node n-purple" style="min-width:280px">✨ Synthesizer Agent<small>Root cause · Workaround · Actions · Confidence</small></div>
+      </div>
+      <div class="arch-down">↓</div>
+
+      <div class="arch-row" style="flex-wrap:wrap;gap:8px;justify-content:center">
+        <div class="arch-node n-gray">📄 Report + Chat UI</div>
+        <div class="arch-node n-gray">🔔 Notify<small>Slack · Email · Webex</small></div>
+        <div class="arch-node n-gray">📥 Export<small>PDF · PPT</small></div>
+        <div class="arch-node n-gray">🔧 Workaround<small>Approval gate</small></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ INTAKE ══ -->
+<div class="section">
+  <div class="section-eyebrow">Flows</div>
+  <div class="section-title">Incident Intake</div>
+  <div class="section-sub">Engineers submit manually via the UI form, or incidents are auto-ingested from Jira and other systems via webhooks. Both paths run the same pipeline.</div>
+
+  <div class="intake-grid">
+    <div class="intake-card">
+      <h4>🖥️ Path A — Manual (UI Form)</h4>
+      <div class="step"><div class="step-num">1</div>Engineer fills title, description, severity, metadata</div>
+      <div class="step"><div class="step-num">2</div><code style="font-size:.8rem">POST /api/analysis</code> returns <code style="font-size:.8rem">job_id</code> immediately</div>
+      <div class="step"><div class="step-num">3</div>UI polls every 3 s while analysis runs in the background</div>
+      <div class="step"><div class="step-num">4</div>Report appears in UI on completion</div>
+    </div>
+    <div class="intake-card">
+      <h4>⚡ Path B — Automatic (Webhook)</h4>
+      <div class="step"><div class="step-num">1</div>Jira creates or transitions a ticket matching trigger rules</div>
+      <div class="step"><div class="step-num">2</div>Jira fires webhook → HMAC signature validated</div>
+      <div class="step"><div class="step-num">3</div>Adapter maps payload to Incident model → Celery task enqueued</div>
+      <div class="step"><div class="step-num">4</div>Slack / email notification sent with link: <code style="font-size:.75rem">/analysis/{id}</code></div>
+    </div>
+  </div>
+  <div style="margin-top:14px;padding:12px 16px;background:var(--gray-100);border-radius:var(--radius);font-size:.82rem;color:var(--gray-600)">
+    <strong>Trigger rules</strong> are config-driven in <code>config.yaml</code> — only specific issue types, priorities, and project keys fire analysis, keeping noise low.
+  </div>
+</div>
+
+<!-- ══ TECH STACK ══ -->
+<div class="section">
+  <div class="section-eyebrow">Technology</div>
+  <div class="section-title">Tech Stack</div>
+  <div class="section-sub">Each choice optimises for pluggability and portability — swap any integration without touching the core pipeline.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Concern</th><th>Choice</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-concern">LLM Provider</td><td class="td-choice">Pluggable via <code>.env</code></td><td class="td-reason">Anthropic, OpenAI, Google, Bedrock — switch with two env vars, no code change</td></tr>
+        <tr><td class="td-concern">Agent Framework</td><td class="td-choice">LangGraph</td><td class="td-reason">Typed state machine; parallel Send API; Postgres checkpointer for resume/re-run; interrupt for approval gates</td></tr>
+        <tr><td class="td-concern">API</td><td class="td-choice">FastAPI + uvicorn</td><td class="td-reason">Async-native; SSE for chat streaming; OpenAPI docs auto-generated</td></tr>
+        <tr><td class="td-concern">Task Queue</td><td class="td-choice">Celery + Redis</td><td class="td-reason">Decouples HTTP from 5–15 min analysis runs; 100-concurrent ceiling enforced at worker level</td></tr>
+        <tr><td class="td-concern">UI</td><td class="td-choice">React + Vite + TypeScript</td><td class="td-reason">FastAPI serves the built SPA — single container, portable anywhere; shadcn/ui + Tailwind</td></tr>
+        <tr><td class="td-concern">Database</td><td class="td-choice">PostgreSQL + SQLAlchemy</td><td class="td-reason">Incidents, analysis versions, chat history, token metrics, audit log; Alembic migrations</td></tr>
+        <tr><td class="td-concern">PDF Export</td><td class="td-choice">WeasyPrint + Jinja2</td><td class="td-reason">HTML → PDF with full CSS/branding; technical and executive audience templates</td></tr>
+        <tr><td class="td-concern">PPT Export</td><td class="td-choice">python-pptx</td><td class="td-reason">Programmatic slide generation; executive and customer-facing templates</td></tr>
+        <tr><td class="td-concern">Packaging</td><td class="td-choice">uv + pyproject.toml</td><td class="td-reason">Per-provider optional extras; fast, reproducible installs</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ FEATURES ══ -->
+<div class="section">
+  <div class="section-eyebrow">Capabilities</div>
+  <div class="section-title">Key Features</div>
+  <div class="section-sub">Beyond automated analysis — a complete engineer review workflow with AI collaboration built in.</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-icon" style="background:var(--purple-lt)">🤖</div>
+      <h3>Multi-Agent Pipeline</h3>
+      <p>Orchestrator LLM decides which agents to activate. Log, code, and defect agents run in parallel via LangGraph's Send API. Synthesiser produces root cause, workaround, and prioritised actions with a confidence score.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--green-lt)">💬</div>
+      <h3>Chat for Clarifications</h3>
+      <p>Engineers ask follow-up questions with full incident context — raw sub-agent findings, current report, and conversation history all in the system prompt. Responses stream in real time via SSE. AI can propose direct field edits (accept / dismiss).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--amber-lt)">📝</div>
+      <h3>Analysis Versioning</h3>
+      <p>Every edit — manual or chat-suggested — creates a new version. The original AI output (v0) is never overwritten. Version history with diffs is available in the UI. Share and export always use the latest approved version.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--rose-lt)">📈</div>
+      <h3>Token Usage Tracking</h3>
+      <p>Each analysis records per-agent token counts and estimated cost. Aggregate trends identify which agents are most expensive, enabling targeted prompt optimisation over time.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#dbeafe">🔌</div>
+      <h3>Pluggable Adapters</h3>
+      <p>Every external system sits behind an abstract base class. Add Splunk, Datadog, Salesforce, or any other source by subclassing one file and adding one config.yaml entry — no pipeline changes.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--green-lt)">🔬</div>
+      <h3>Evaluation Agent</h3>
+      <p>On-demand, post-closure agent that scores the prior AI analysis against the actual resolution. Emits prompt-improvement hints written back to the database for continuous analysis quality improvement.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADAPTERS ══ -->
+<div class="section">
+  <div class="section-eyebrow">Integrations</div>
+  <div class="section-title">Pluggable Adapter Map</div>
+  <div class="section-sub">Subclass one abstract base class per category. Phase-1 adapters are fully implemented; later phases are stubbed and ready to fill in.</div>
+
+  <div class="adapter-grid">
+    <div class="adapter-col">
+      <div class="adapter-header" style="background:var(--green-lt);color:#14532d">📂 Data Sources</div>
+      <div class="adapter-body">
+        <div class="adapter-item a-done">
+          <span class="ai">📦</span>
+          <div><div class="an">Log Bundle</div><div class="as">ZIP / directory · Phase 1 ✓</div></div>
+        </div>
+        <div class="adapter-item a-p2">
+          <span class="ai">🔍</span>
+          <div><div class="an">Splunk</div><div class="as">REST API · Phase 2</div></div>
+        </div>
+        <div class="adapter-item a-p2">
+          <span class="ai">🐕</span>
+          <div><div class="an">Datadog</div><div class="as">Logs API · Phase 2</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="adapter-col">
+      <div class="adapter-header" style="background:var(--blue-lt);color:#1e40af">🎫 Incident Systems</div>
+      <div class="adapter-body">
+        <div class="adapter-item a-done">
+          <span class="ai">📋</span>
+          <div><div class="an">Jira</div><div class="as">Webhook + Polling · Phase 1 ✓</div></div>
+        </div>
+        <div class="adapter-item a-done">
+          <span class="ai">🔗</span>
+          <div><div class="an">Generic Webhook</div><div class="as">Standard payload · Phase 1 ✓</div></div>
+        </div>
+        <div class="adapter-item a-p2">
+          <span class="ai">☁️</span>
+          <div><div class="an">Salesforce</div><div class="as">Case events · Phase 2</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="adapter-col">
+      <div class="adapter-header" style="background:var(--amber-lt);color:#78350f">🔔 Notifications</div>
+      <div class="adapter-body">
+        <div class="adapter-item a-done">
+          <span class="ai">💬</span>
+          <div><div class="an">Slack</div><div class="as">Bot + rich blocks · Phase 1 ✓</div></div>
+        </div>
+        <div class="adapter-item a-p3">
+          <span class="ai">📧</span>
+          <div><div class="an">Email</div><div class="as">SendGrid · Phase 3</div></div>
+        </div>
+        <div class="adapter-item a-p3">
+          <span class="ai">🟢</span>
+          <div><div class="an">Webex</div><div class="as">Bot API · Phase 3</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UI MOCKUP ══ -->
+<div class="section">
+  <div class="section-eyebrow">User Experience</div>
+  <div class="section-title">Review Interface</div>
+  <div class="section-sub">Engineers open the link from Slack or navigate directly. The report and AI chat sit side-by-side; actions are pinned to the bottom bar.</div>
+
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="dot" style="background:#ef4444"></div>
+      <div class="dot" style="background:#f59e0b"></div>
+      <div class="dot" style="background:#22c55e"></div>
+      <span class="mockup-url">localhost:5173/analysis/4821 &nbsp;·&nbsp; INC-4821 · P1 · Payment timeout · via Jira &nbsp;·&nbsp; <strong style="color:#16a34a">87% confidence</strong></span>
+    </div>
+
+    <div class="mockup-body">
+      <!-- Left: Report -->
+      <div class="mockup-panel">
+        <div class="mp-label">Analysis Report <a>Edit</a></div>
+
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:4px">Root Cause</div>
+        <div class="mp-field">Downstream timeout in the payment gateway adapter caused by a misconfigured HTTP connection pool (max=5) under peak load. Circuit breaker tripped at 14:32 UTC.</div>
+
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin:10px 0 4px">Workaround</div>
+        <div class="mp-field">Set <code>PAYMENT_POOL_MAX=20</code> in env config and redeploy. Monitor p99 latency for 15 min.</div>
+
+        <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin:10px 0 4px">Recommended Actions</div>
+        <div class="mp-field"><span class="mp-pill pill-high">HIGH</span> Fix pool config in helm chart</div>
+        <div class="mp-field"><span class="mp-pill pill-med">MED</span> Add circuit breaker alert to Datadog</div>
+        <div class="mp-field"><span class="mp-pill pill-low">LOW</span> Document pool tuning runbook</div>
+
+        <div style="margin-top:10px;font-size:.68rem;color:var(--gray-400)">
+          v1 (you, 5 min ago) · <span style="color:var(--blue)">v0 AI original</span> · <span style="color:var(--blue)">View diff</span>
+        </div>
+      </div>
+
+      <!-- Right: Chat -->
+      <div class="mockup-panel">
+        <div class="mp-label">Chat with AI</div>
+
+        <div class="chat-msg cm-user">Why was a DB pool issue ruled out?</div>
+        <div class="chat-msg cm-ai">
+          DB pool utilisation peaked at 42% — well under capacity. The bottleneck was in the <code>PaymentGatewayClient</code> HTTP pool, not the database layer.
+          <div class="edit-suggest">
+            <strong>Suggested edit to root_cause:</strong><br/>
+            "...misconfigured HTTP connection pool in PaymentGatewayClient (not DB layer)..."
+            <div style="margin-top:5px;display:flex;gap:6px">
+              <span class="btn btn-blue" style="font-size:.65rem;padding:3px 9px">Apply</span>
+              <span style="font-size:.65rem;color:var(--gray-400);cursor:pointer;padding:3px 0">Dismiss</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <div style="flex:1;background:var(--gray-100);border-radius:7px;padding:8px 11px;font-size:.73rem;color:var(--gray-400)">Ask a question...</div>
+          <span class="btn btn-blue" style="font-size:.72rem">Send</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-actions">
+      <span class="btn btn-primary">Execute Workaround</span>
+      <span class="btn btn-outline">Slack</span>
+      <span class="btn btn-outline">Email</span>
+      <span class="btn btn-outline">Webex</span>
+      <div style="width:1px;background:var(--gray-200);height:24px;align-self:center"></div>
+      <span class="btn btn-outline">PDF Technical</span>
+      <span class="btn btn-outline">PDF Executive</span>
+      <span class="btn btn-outline">PPT Executive</span>
+      <span class="btn btn-outline">PPT Customer</span>
+      <span class="btn btn-outline">Re-run</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXPORT ══ -->
+<div class="section">
+  <div class="section-eyebrow">Output</div>
+  <div class="section-title">Export Templates</div>
+  <div class="section-sub">Four audience-specific templates generated from the same report data — no manual re-writing.</div>
+
+  <div class="export-grid">
+    <div class="export-card">
+      <h4>📄 PDF — Technical</h4>
+      <p>Full analysis with log references, code pointers, sub-agent findings appendix. For the engineering team.</p>
+      <div class="export-slides">
+        <span class="slide-chip">Root cause (technical)</span>
+        <span class="slide-chip">Log references</span>
+        <span class="slide-chip">Recommended actions</span>
+        <span class="slide-chip">Sub-agent findings</span>
+        <span class="slide-chip">Token usage</span>
+      </div>
+    </div>
+    <div class="export-card">
+      <h4>📄 PDF — Executive</h4>
+      <p>Plain-language summary. Business impact, simplified root cause, action owners. For leadership review.</p>
+      <div class="export-slides">
+        <span class="slide-chip">Business impact</span>
+        <span class="slide-chip">Root cause (plain)</span>
+        <span class="slide-chip">Resolution</span>
+        <span class="slide-chip">Open action items</span>
+      </div>
+    </div>
+    <div class="export-card">
+      <h4>📊 PPT — Executive</h4>
+      <p>5-slide deck for leadership briefings. Incident summary, impact, root cause, timeline, prevention.</p>
+      <div class="export-slides">
+        <span class="slide-chip">Slide 1: Summary</span>
+        <span class="slide-chip">Slide 2: Impact</span>
+        <span class="slide-chip">Slide 3: Root cause</span>
+        <span class="slide-chip">Slide 4: Timeline</span>
+        <span class="slide-chip">Slide 5: Prevention</span>
+      </div>
+    </div>
+    <div class="export-card">
+      <h4>📊 PPT — Customer</h4>
+      <p>External-facing deck. What happened, what we did, and what we're doing to prevent recurrence.</p>
+      <div class="export-slides">
+        <span class="slide-chip">What happened</span>
+        <span class="slide-chip">What we did</span>
+        <span class="slide-chip">Prevention plan</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ API ══ -->
+<div class="section">
+  <div class="section-eyebrow">API</div>
+  <div class="section-title">REST Endpoints</div>
+  <div class="section-sub">All routes served by FastAPI. The React SPA is served from the same process as static files from <code>ui/dist/</code>.</div>
+
+  <div class="endpoints">
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/api/analysis</span><span class="ep-desc">Submit incident (manual)</span></div>
+    <div class="ep"><span class="method m-get">GET</span><span class="ep-path">/api/analysis/{id}</span><span class="ep-desc">Status + current version</span></div>
+    <div class="ep"><span class="method m-patch">PATCH</span><span class="ep-path">/api/analysis/{id}</span><span class="ep-desc">Save edited version</span></div>
+    <div class="ep"><span class="method m-get">GET</span><span class="ep-path">/api/analysis/{id}/versions</span><span class="ep-desc">All versions with diffs</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/api/analysis/{id}/chat</span><span class="ep-desc">Send message → SSE stream</span></div>
+    <div class="ep"><span class="method m-get">GET</span><span class="ep-path">/api/analysis/{id}/chat</span><span class="ep-desc">Full conversation history</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/api/analysis/{id}/export</span><span class="ep-desc">Generate PDF or PPTX download</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/api/analysis/{id}/action</span><span class="ep-desc">Execute workaround / share / notify</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/webhooks/jira</span><span class="ep-desc">Jira intake (HMAC validated)</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/webhooks/salesforce</span><span class="ep-desc">Salesforce case event intake</span></div>
+    <div class="ep"><span class="method m-post">POST</span><span class="ep-path">/webhooks/generic</span><span class="ep-desc">Standard payload for any system</span></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  <strong>Prism</strong> &nbsp;·&nbsp; Project Overview &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Confidential — for internal review
+</footer>
+
+</body>
+</html>

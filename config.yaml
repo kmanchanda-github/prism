@@ -1,0 +1,60 @@
+llm:
+  # provider and model are set via LLM_PROVIDER / LLM_MODEL env vars.
+  # The values below are fallback defaults only used if the env vars are absent.
+  max_tokens: 8192
+  temperature: 0.2
+
+analysis:
+  confidence_threshold: 0.7      # retry synthesis if below this
+  max_retries: 2
+  max_concurrent: 100
+  log_chunk_size_chars: 50000    # sliding window for large log bundles
+  chat_summary_after_turns: 20
+
+incident_systems:
+  jira:
+    enabled: false
+    intake_mode: webhook           # webhook | polling
+    polling_interval_seconds: 60
+    webhook_secret: ${JIRA_WEBHOOK_SECRET}
+    trigger_on:
+      issue_types: [Bug, Incident]
+      priorities: [P0, P1, P2]
+      projects: []                 # empty = all projects
+      status_transitions: [Open, "In Progress"]
+
+  salesforce:
+    enabled: false
+    intake_mode: webhook
+    webhook_secret: ${SALESFORCE_WEBHOOK_SECRET}
+
+data_sources:
+  log_bundle:
+    enabled: true
+    max_file_size_mb: 100
+
+  splunk:
+    enabled: false
+    lookback_hours: 24
+
+  datadog:
+    enabled: false
+    lookback_hours: 24
+
+notifications:
+  slack:
+    enabled: false
+    default_channel: "#incidents"
+
+  email:
+    enabled: false
+    from_address: noreply@yourorg.com
+
+  webex:
+    enabled: false
+
+export:
+  pdf:
+    logo_path: null              # path to org logo for branded reports
+  pptx:
+    template_path: null          # path to .pptx template file
