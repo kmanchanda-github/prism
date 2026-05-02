@@ -134,9 +134,70 @@
     .bg-rose   { background:var(--rose-lt); }   .bg-teal   { background:var(--teal-lt); }
     .bg-orange { background:var(--orange-lt); } .bg-sky    { background:var(--sky-lt); }
     .bg-gray   { background:var(--gray-100); }
+
+    /* ── Theme toggle button ── */
+    #theme-toggle { position:fixed; top:16px; right:16px; z-index:999; width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); backdrop-filter:blur(8px); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:background .2s, border-color .2s; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+    #theme-toggle:hover { background:rgba(255,255,255,.22); }
+    [data-theme="light"] #theme-toggle { background:rgba(0,0,0,.06); border-color:rgba(0,0,0,.12); box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    [data-theme="light"] #theme-toggle:hover { background:rgba(0,0,0,.12); }
+
+    /* ── Dark theme overrides ── */
+    [data-theme="dark"] body { background:#0f172a; color:#e2e8f0; }
+
+    /* Tab bar */
+    [data-theme="dark"] .tab-bar-wrap { background:#1e293b; border-bottom-color:#334155; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+    [data-theme="dark"] .tab-btn { color:#64748b; }
+    [data-theme="dark"] .tab-btn:hover { color:#e2e8f0; }
+    [data-theme="dark"] .tab-btn.active { color:#93c5fd; border-bottom-color:#93c5fd; }
+
+    /* Cards and containers */
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .overview,
+    [data-theme="dark"] .usage,
+    [data-theme="dark"] .resources,
+    [data-theme="dark"] footer { background:#1e293b; border-color:#334155; }
+    [data-theme="dark"] .card h3,
+    [data-theme="dark"] .usage h3,
+    [data-theme="dark"] .resources h3 { color:#f1f5f9; }
+
+    /* Concept items */
+    [data-theme="dark"] .c-title { color:#e2e8f0; }
+    [data-theme="dark"] .c-desc { color:#94a3b8; }
+
+    /* Overview and tagline text */
+    [data-theme="dark"] .overview { color:#94a3b8; }
+    [data-theme="dark"] .overview strong { color:#f1f5f9; }
+    [data-theme="dark"] .panel-head-text .tagline { color:#94a3b8; }
+    [data-theme="dark"] .panel-head-text h2 { color:#f1f5f9; }
+
+    /* Usage items */
+    [data-theme="dark"] .usage-item { color:#94a3b8; }
+
+    /* Resource items */
+    [data-theme="dark"] .res-item { border-bottom-color:#253347; }
+    [data-theme="dark"] .res-info a { color:#e2e8f0; }
+    [data-theme="dark"] .res-info a:hover { color:#93c5fd; }
+    [data-theme="dark"] .res-info p { color:#64748b; }
+
+    /* Code blocks */
+    [data-theme="dark"] .code-header { background:#162032; border-radius:var(--radius) var(--radius) 0 0; }
+    [data-theme="dark"] .code-header span { color:#94a3b8; }
+
+    /* Footer */
+    [data-theme="dark"] footer { color:#64748b; }
+    [data-theme="dark"] footer strong { color:#94a3b8; }
+
+    /* LangGraph sub-section divider */
+    [data-theme="dark"] [style*="border-top:2px dashed"] { border-top-color:#334155 !important; }
+
+    /* Section label */
+    [data-theme="dark"] .sec-label { color:#60a5fa; }
+    [data-theme="dark"] .sec-label::after { background:#60a5fa; }
   </style>
 </head>
 <body>
+
+<button id="theme-toggle" title="Toggle light / dark theme" aria-label="Toggle theme">🌙</button>
 
 <!-- HERO -->
 <div class="hero">
@@ -803,9 +864,9 @@ KEYS celery-task-meta-*</pre>
 </footer>
 
 <script>
+  // Tab switching
   const btns   = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tab-panel');
-
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.tab;
@@ -816,6 +877,24 @@ KEYS celery-task-meta-*</pre>
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
+
+  // Theme toggle
+  (function() {
+    var root = document.documentElement;
+    var btn  = document.getElementById('theme-toggle');
+    var stored = localStorage.getItem('prism-theme');
+    root.setAttribute('data-theme', stored || 'dark');
+    updateBtn();
+    btn.addEventListener('click', function() {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('prism-theme', next);
+      updateBtn();
+    });
+    function updateBtn() {
+      btn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    }
+  })();
 </script>
 </body>
 </html>
