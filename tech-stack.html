@@ -152,7 +152,6 @@
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="fastapi">   <span class="tab-icon">⚡</span> FastAPI</button>
     <button class="tab-btn"        data-tab="langgraph"> <span class="tab-icon">🕸️</span> LangGraph</button>
-    <button class="tab-btn"        data-tab="langchain"> <span class="tab-icon">🔗</span> LangChain</button>
     <button class="tab-btn"        data-tab="celery">    <span class="tab-icon">🌿</span> Celery</button>
     <button class="tab-btn"        data-tab="redis">     <span class="tab-icon">🔴</span> Redis</button>
     <button class="tab-btn"        data-tab="postgres">  <span class="tab-icon">🐘</span> PostgreSQL</button>
@@ -309,54 +308,43 @@ graph = builder.<span class="fn">compile</span>(checkpointer=checkpointer)</pre>
       <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://langchain-ai.github.io/langgraph/how-tos/branching/">How-to: Branching &amp; Parallel Nodes</a><p>Covers the Send API and fan-out/fan-in patterns — exactly what Prism uses for parallel agents.</p></div></div>
       <div class="res-item"><span class="res-badge rb-video">Video</span><div class="res-info"><a href="https://www.youtube.com/watch?v=R8KB-Zcynxc">LangGraph Crash Course — LangChain YouTube</a><p>45-minute walkthrough of the core primitives with live coding. Good complement to the written docs.</p></div></div>
     </div>
-  </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════ LANGCHAIN -->
-<div class="tab-panel" id="tab-langchain">
-  <div class="container">
-    <div class="panel-head">
-      <div class="panel-logo bg-blue">🔗</div>
+    <!-- LangChain sub-section -->
+    <div style="border-top:2px dashed var(--gray-200); margin:36px 0 32px;"></div>
+    <div class="panel-head" style="margin-bottom:20px;">
+      <div class="panel-logo bg-blue" style="width:48px;height:48px;font-size:24px;">🔗</div>
       <div class="panel-head-text">
-        <h2>LangChain <span class="version-badge" style="background:var(--blue-lt);color:var(--blue-dk);">v0.3</span></h2>
-        <p class="tagline">Abstraction layer for LLMs, prompts, chains, and tools. Provides a unified interface across every major model provider so swapping models requires zero agent code changes.</p>
+        <h2 style="font-size:1.25rem;">LangChain <span class="version-badge" style="background:var(--blue-lt);color:var(--blue-dk);">v0.3</span><span style="font-size:.8rem;font-weight:400;color:var(--gray-400);margin-left:10px;">— the abstraction layer LangGraph nodes call</span></h2>
+        <p class="tagline" style="font-size:.84rem;">LangGraph is built on top of LangChain. Every node that calls an LLM uses LangChain's unified chat model interface — the same <code>.invoke()</code> / <code>.astream()</code> API works across all providers.</p>
       </div>
     </div>
 
-    <div class="overview">
-      LangChain standardises how Python code talks to LLMs. Instead of importing the Anthropic SDK directly in every agent, you call <code>get_llm()</code> and receive a <strong>LangChain chat model object</strong> with a consistent <code>.invoke()</code> / <code>.stream()</code> / <code>.ainvoke()</code> API regardless of the underlying provider. This is the key enabler of Prism's <strong>pluggable LLM architecture</strong>.
-    </div>
-
-    <div class="sec-label">Key Concepts</div>
     <div class="two-col" style="margin-bottom:28px;">
       <div class="card">
         <h3>Core primitives</h3>
         <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Chat Models</div><div class="c-desc">ChatAnthropic, ChatOpenAI, ChatGoogleGenerativeAI, ChatBedrock — all share the same interface. Call .invoke(messages) or await .ainvoke(messages).</div></div></div>
         <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Messages</div><div class="c-desc">HumanMessage, AIMessage, SystemMessage. Build a conversation as a list and pass it to the model. No provider-specific format needed.</div></div></div>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">PromptTemplate / ChatPromptTemplate</div><div class="c-desc">Parameterise prompts with variables. .format_messages(incident=...) fills the template at runtime without string concatenation.</div></div></div>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">Output Parsers</div><div class="c-desc">Transform raw LLM text into structured Python objects — JSON, Pydantic models, lists. Prism's synthesizer uses regex extraction as a lightweight alternative.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">PromptTemplate</div><div class="c-desc">Parameterise prompts with variables. .format_messages(incident=...) fills the template at runtime without string concatenation.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">UsageMetadata</div><div class="c-desc">response.usage_metadata exposes input_tokens and output_tokens. Prism's TokenTracker reads this after each call to accumulate cost.</div></div></div>
       </div>
       <div class="card">
         <h3>Invocation patterns</h3>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.invoke() — sync</div><div class="c-desc">Blocks until the full response arrives. Returns an AIMessage. Use for batch/non-streaming work like the synthesizer.</div></div></div>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.ainvoke() — async</div><div class="c-desc">Async version of invoke. Use inside async def functions (FastAPI routes, LangGraph async nodes) to avoid blocking the event loop.</div></div></div>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.astream() — async streaming</div><div class="c-desc">Async generator yielding AIMessageChunk objects as the model produces tokens. Powers Prism's chat streaming endpoint.</div></div></div>
-        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">UsageMetadata</div><div class="c-desc">response.usage_metadata gives input_tokens and output_tokens. Prism's TokenTracker reads this after each agent call to accumulate cost.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.invoke() — sync</div><div class="c-desc">Blocks until the full response arrives. Returns an AIMessage. Used by the synthesizer and analyst nodes.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.ainvoke() — async</div><div class="c-desc">Async equivalent. Use inside async def LangGraph nodes to avoid blocking the event loop.</div></div></div>
+        <div class="concept"><div class="c-dot" style="background:var(--blue);"></div><div><div class="c-title">.astream() — async streaming</div><div class="c-desc">Yields AIMessageChunk objects token by token. Powers Prism's chat SSE endpoint — each chunk is forwarded directly to the browser.</div></div></div>
       </div>
     </div>
 
     <div class="sec-label">How Prism Uses It</div>
     <div class="usage" style="margin-bottom:28px;">
       <h3>The get_llm() factory</h3>
-      <div class="usage-item"><span class="usage-icon">🏭</span><span><code>src/core/llm.py</code> reads <code>LLM_PROVIDER</code> and <code>LLM_MODEL</code> from env, lazy-imports only the relevant langchain-* package, and returns the appropriate chat model object.</span></div>
-      <div class="usage-item"><span class="usage-icon">🔄</span><span>All four agents (log analyst, code analyst, defect analyst, synthesizer) call <code>get_llm()</code>. Switching from Anthropic to OpenAI means changing two env vars — no agent code changes.</span></div>
-      <div class="usage-item"><span class="usage-icon">💬</span><span>The chat agent calls <code>llm.astream(messages)</code> and yields each chunk's <code>.content</code> directly into the SSE response, achieving real-time token streaming to the browser.</span></div>
-      <div class="usage-item"><span class="usage-icon">📊</span><span>After each <code>.invoke()</code>, <code>response.usage_metadata</code> is read and recorded into <code>TokenTracker</code> for per-analysis cost attribution.</span></div>
+      <div class="usage-item"><span class="usage-icon">🏭</span><span><code>src/core/llm.py</code> reads <code>LLM_PROVIDER</code> and <code>LLM_MODEL</code> from env, lazy-imports only the relevant <code>langchain-*</code> package, and returns the appropriate chat model object.</span></div>
+      <div class="usage-item"><span class="usage-icon">🔄</span><span>Every LangGraph node calls <code>get_llm()</code> — the returned object has the same <code>.invoke()</code> / <code>.astream()</code> interface regardless of provider. Switching providers requires only two env var changes.</span></div>
+      <div class="usage-item"><span class="usage-icon">💬</span><span>The chat agent calls <code>llm.astream(messages)</code> and yields each chunk's <code>.content</code> into the SSE response for real-time streaming.</span></div>
     </div>
 
-    <div class="sec-label">Code Snapshot</div>
     <div class="code-wrap">
-      <div class="code-header"><span>src/core/llm.py — provider factory</span><span class="code-lang">Python</span></div>
+      <div class="code-header"><span>src/core/llm.py — LangChain provider factory</span><span class="code-lang">Python</span></div>
       <pre><span class="kw">def</span> <span class="fn">get_llm</span>(*, max_tokens: <span class="tp">int</span> | <span class="tp">None</span> = <span class="nm">None</span>, temperature: <span class="tp">float</span> | <span class="tp">None</span> = <span class="nm">None</span>):
     provider = settings.llm_provider   <span class="cm"># e.g. "anthropic"</span>
     model    = settings.llm_model      <span class="cm"># e.g. "claude-sonnet-4-6"</span>
@@ -373,12 +361,11 @@ graph = builder.<span class="fn">compile</span>(checkpointer=checkpointer)</pre>
     <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">f"Unknown LLM_PROVIDER='{provider}'"</span>)</pre>
     </div>
 
-    <div class="sec-label">Resources</div>
+    <div class="sec-label">LangChain Resources</div>
     <div class="resources">
       <h3>Where to learn LangChain</h3>
-      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://python.langchain.com/docs/introduction/">python.langchain.com</a><p>Focus on the Chat Models and Messages sections first. LCEL (LangChain Expression Language) is worth understanding for chaining components.</p></div></div>
-      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://python.langchain.com/docs/tutorials/llm_chain/">Build a Simple LLM Chain</a><p>10-minute tutorial covering ChatModel + PromptTemplate + OutputParser — the most common pattern.</p></div></div>
-      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://python.langchain.com/docs/how_to/streaming/">How to stream responses</a><p>Covers .stream(), .astream(), and streaming with LCEL chains — essential for understanding Prism's chat implementation.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-docs">Official Docs</span><div class="res-info"><a href="https://python.langchain.com/docs/introduction/">python.langchain.com</a><p>Focus on the Chat Models and Messages sections first — these map directly to how Prism's nodes call LLMs.</p></div></div>
+      <div class="res-item"><span class="res-badge rb-tut">Tutorial</span><div class="res-info"><a href="https://python.langchain.com/docs/how_to/streaming/">How to stream responses</a><p>Covers .stream(), .astream(), and streaming with LCEL — essential for understanding Prism's chat implementation.</p></div></div>
     </div>
   </div>
 </div>
