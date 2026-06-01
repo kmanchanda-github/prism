@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 COPY pyproject.toml .
-RUN uv pip install --system -e ".[anthropic]"
+# Install both providers so either key works at runtime without rebuilding
+RUN uv pip install --system -e ".[anthropic,openai]"
 
 COPY . .
 COPY --from=ui-builder /ui/dist ./ui/dist
@@ -29,11 +30,16 @@ COPY --from=ui-builder /ui/dist ./ui/dist
 # HF Spaces requires port 7860
 EXPOSE 7860
 
-# Use SQLite (no Postgres needed) and run analysis in-process (no Celery/Redis needed)
+# Use SQLite (no Postgres needed) and run analysis in-process (no Celery/Redis needed).
+# Set LLM_PROVIDER + the matching key in HF Space secrets:
+#   Anthropic: LLM_PROVIDER=anthropic  ANTHROPIC_API_KEY=sk-ant-...  LLM_MODEL=claude-sonnet-4-6
+#   OpenAI:    LLM_PROVIDER=openai     OPENAI_API_KEY=sk-...         LLM_MODEL=gpt-4o
 ENV DATABASE_URL="sqlite+aiosqlite:///./prism.db" \
     CELERY_BROKER_URL="memory://" \
     CELERY_RESULT_BACKEND="cache+memory://" \
     BASE_URL="https://huggingface.co/spaces" \
-    SECRET_KEY="hf-demo-secret-change-in-prod"
+    SECRET_KEY="hf-demo-secret-change-in-prod" \
+    LLM_PROVIDER="anthropic" \
+    LLM_MODEL="claude-sonnet-4-6"
 
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "7860"]

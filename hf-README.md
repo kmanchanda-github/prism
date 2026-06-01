@@ -16,7 +16,13 @@ Prism runs a multi-agent LangGraph pipeline to analyse production incidents. Sub
 
 ## Usage
 
-1. Set `ANTHROPIC_API_KEY` in Space secrets (Settings → Repository secrets)
+1. Set your LLM credentials in **Settings → Repository secrets** — pick one provider:
+
+   | Provider | Secrets to set |
+   |---|---|
+   | **Anthropic** (default) | `ANTHROPIC_API_KEY=sk-ant-...` |
+   | **OpenAI** | `LLM_PROVIDER=openai`, `LLM_MODEL=gpt-4o`, `OPENAI_API_KEY=sk-...` |
+
 2. Open the Space URL — you'll see the Submit form
 3. Paste in an incident title, description, and severity — or use the demo scenario below
 
