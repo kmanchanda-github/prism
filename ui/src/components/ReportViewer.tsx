@@ -2,13 +2,18 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface Action { id: string; title: string; description: string; priority: string; type: string; }
-interface Version { root_cause: string; workaround: string; recommended_actions: Action[]; confidence_score: number; }
-interface Props { analysisId: string; version?: Version; onSave: () => void; }
+interface SubReport { agent: string; findings: string; sources_used: string[]; confidence: number; }
+interface Version {
+  root_cause: string; workaround: string; recommended_actions: Action[];
+  confidence_score: number; sub_reports?: SubReport[];
+}
+interface Props { analysisId: string; version?: Version; onSave: () => void; onApplyEdit?: (field: string, value: string) => void; }
 
-export function ReportViewer({ analysisId, version, onSave }: Props) {
+export function ReportViewer({ analysisId, version, onSave, onApplyEdit }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Version | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showFindings, setShowFindings] = useState(false);
 
   function startEdit() {
     setDraft(version ? { ...version } : null);
@@ -75,6 +80,48 @@ export function ReportViewer({ analysisId, version, onSave }: Props) {
           ))}
         </ul>
       </Section>
+
+      {version.sub_reports && version.sub_reports.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowFindings((v) => !v)}
+            className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-700"
+          >
+            <span>{showFindings ? "▾" : "▸"}</span>
+            Agent Findings ({version.sub_reports.length})
+          </button>
+
+          {showFindings && (
+            <div className="mt-3 space-y-4">
+              {version.sub_reports.map((r, i) => {
+                const pct = Math.round(r.confidence * 100);
+                const barColor = pct >= 70 ? "bg-green-500" : pct >= 40 ? "bg-yellow-400" : "bg-red-400";
+                return (
+                  <div key={i} className="border border-gray-100 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-gray-700 capitalize">{r.agent.replace("_", " ")}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-xs text-gray-500">{pct}% confidence</span>
+                      </div>
+                    </div>
+                    {r.sources_used.length > 0 && (
+                      <p className="text-xs text-gray-400 mb-2">
+                        Sources: {r.sources_used.join(", ")}
+                      </p>
+                    )}
+                    <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono bg-white border border-gray-100 rounded p-3 max-h-48 overflow-y-auto">
+                      {r.findings}
+                    </pre>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

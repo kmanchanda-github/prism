@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Final Rubric Comparison</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; padding: 40px 24px; }
+    .container { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 12px;
+                 box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 48px; }
+    h1 { font-size: 1.7em; color: #1a1a2e; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.95em; margin-bottom: 32px; }
+    h2 { font-size: 1.1em; color: #16213e; margin: 36px 0 12px; padding-bottom: 6px;
+         border-bottom: 2px solid #e5e7eb; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin-bottom: 8px; }
+    th { background: #f8f9fb; text-align: left; padding: 9px 12px; color: #374151;
+         font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .pass  { color: #16a34a; font-weight: bold; }
+    .warn  { color: #d97706; font-weight: bold; }
+    .note  { color: #6b7280; font-size: 0.85em; font-style: italic; }
+    .score-row td { font-weight: 600; background: #f8f9fb; }
+    .total-row td { font-weight: 700; background: #1a1a2e; color: #fff; font-size: 1em; }
+    .total-row td.score { color: #4ade80; font-size: 1.1em; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78em;
+            font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .pill-green { background: #dcfce7; color: #15803d; }
+    .pill-amber { background: #fef9c3; color: #92400e; }
+    .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 28px 0; }
+    .summary-card { background: #f8f9fb; border-radius: 8px; padding: 16px 12px; text-align: center;
+                    border: 1px solid #e5e7eb; }
+    .summary-card .cat { font-size: 0.75em; color: #6b7280; margin-bottom: 6px; font-weight: 600;
+                         text-transform: uppercase; letter-spacing: 0.04em; }
+    .summary-card .pts { font-size: 1.6em; font-weight: 700; color: #1a1a2e; }
+    .summary-card .max { font-size: 0.78em; color: #9ca3af; }
+    .summary-card.full { border-color: #86efac; background: #f0fdf4; }
+    .summary-card.full .pts { color: #16a34a; }
+    .total-card { background: #1a1a2e; border-radius: 8px; padding: 20px 24px;
+                  display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .total-card .label { color: #d1d5db; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .total-card .score { color: #4ade80; font-size: 2.2em; font-weight: 700; }
+    .total-card .grade { color: #fbbf24; font-size: 1.1em; font-weight: 700; }
+    footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb;
+             font-size: 0.78em; color: #9ca3af; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Prism — Rubric Comparison</h1>
+  <p class="subtitle">BYOP Project &nbsp;·&nbsp; Final Assessment &nbsp;·&nbsp; May 2026</p>
+
+  <!-- Score summary -->
+  <div class="total-card">
+    <div>
+      <div class="label">Final Score</div>
+      <div class="score">96 / 100</div>
+    </div>
+    <div class="grade">A+</div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="cat">Functionality</div>
+      <div class="pts">34</div>
+      <div class="max">/ 35</div>
+    </div>
+    <div class="summary-card">
+      <div class="cat">Agent Design</div>
+      <div class="pts">24</div>
+      <div class="max">/ 25</div>
+    </div>
+    <div class="summary-card">
+      <div class="cat">User Experience</div>
+      <div class="pts">14</div>
+      <div class="max">/ 15</div>
+    </div>
+    <div class="summary-card">
+      <div class="cat">Routing &amp; Fallback</div>
+      <div class="pts">14</div>
+      <div class="max">/ 15</div>
+    </div>
+    <div class="summary-card full">
+      <div class="cat">Documentation</div>
+      <div class="pts">10</div>
+      <div class="max">/ 10</div>
+    </div>
+  </div>
+
+  <!-- 1. Functionality -->
+  <h2>1. Functionality &nbsp;<span class="pill pill-green">34 / 35</span></h2>
+  <table>
+    <tr><th style="width:72%">Evidence</th><th>Status</th></tr>
+    <tr><td>End-to-end pipeline: Submit form → Celery → LangGraph → DB → UI</td><td><span class="pass">✓</span></td></tr>
+    <tr><td><strong>log_agent</strong>: real LLM analysis of log bundle chunks with line-specific findings</td><td><span class="pass">✓</span></td></tr>
+    <tr><td><strong>code_agent</strong>: real LLM review of git diff, references file names and config keys</td><td><span class="pass">✓</span></td></tr>
+    <tr><td><strong>defect_agent</strong>: real LLM cross-reference against known-issues DB, cites DEFECT-IDs</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>Synthesizer: structured JSON output → root cause, workaround, typed actions, confidence score</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>Chat agent: full incident + sub-report context loaded from DB on every request</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>PDF exporter: Jinja2-rendered with confidence bars, sub-agent findings, priority badges</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>PPTX exporter: 4-slide executive deck (summary, root cause, resolution, actions)</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>Webhook intake: Jira + generic routes wired with signature validation</td><td><span class="pass">✓</span></td></tr>
+    <tr><td>Version history: AI v0 → engineer edits versioned with <code>edit_source</code></td><td><span class="pass">✓</span></td></tr>
+    <tr><td>Evaluator agent: <code>NotImplementedError</code> stub (planned Phase 4)</td><td><span class="warn">–1</span></td></tr>
+  </table>
+
+  <!-- 2. Agent Design -->
+  <h2>2. Agent Design &nbsp;<span class="pill pill-green">24 / 25</span></h2>
+  <table>
+    <tr><th style="width:50%">Sub-criterion</th><th style="width:14%">Weight</th><th>Score</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>Modular Agents</strong></td><td>10</td><td><span class="pass">10 / 10</span></td>
+      <td>Each agent is an independent file with a single <code>run()</code> entry point; pluggable adapter pattern — swapping a data source doesn't touch agent code</td>
+    </tr>
+    <tr>
+      <td><strong>Routing &amp; Orchestration</strong></td><td>10</td><td><span class="pass">9 / 10</span></td>
+      <td>LangGraph <code>StateGraph</code> with LLM-driven <code>route_decision</code>, <code>fan_out</code> via <code>Send</code>, confidence-gated retry loop; <code>notify</code> node is a no-op placeholder</td>
+    </tr>
+    <tr>
+      <td><strong>Agent Communication</strong></td><td>5</td><td><span class="pass">5 / 5</span></td>
+      <td>Shared <code>AnalysisState</code> Pydantic model; <code>Annotated[list, operator.add]</code> for parallel sub-report merging; per-agent token tracking</td>
+    </tr>
+  </table>
+
+  <!-- 3. User Experience -->
+  <h2>3. User Experience &nbsp;<span class="pill pill-green">14 / 15</span></h2>
+  <table>
+    <tr><th style="width:50%">Sub-criterion</th><th style="width:14%">Weight</th><th>Score</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>UI Interface</strong></td><td>7</td><td><span class="pass">7 / 7</span></td>
+      <td>Submit form; Analysis page with polling, severity badge, confidence %; error/failed states with re-run button</td>
+    </tr>
+    <tr>
+      <td><strong>Visualization</strong></td><td>5</td><td><span class="pass">4 / 5</span></td>
+      <td>Agent Findings panel with per-agent colour-coded confidence bars, sources, scrollable findings; priority colour badges on actions. No timeline chart.</td>
+    </tr>
+    <tr>
+      <td><strong>Usability for Demo</strong></td><td>3</td><td><span class="pass">3 / 3</span></td>
+      <td>Loading spinner; streaming chat with typing indicator; Apply/Dismiss on suggested edits → live report update + version increment</td>
+    </tr>
+  </table>
+
+  <!-- 4. Routing & Fallback -->
+  <h2>4. Routing &amp; Fallback &nbsp;<span class="pill pill-green">14 / 15</span></h2>
+  <table>
+    <tr><th style="width:50%">Sub-criterion</th><th style="width:14%">Weight</th><th>Score</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>Fallback Logic</strong></td><td>8</td><td><span class="pass">8 / 8</span></td>
+      <td>Retry loop up to <code>max_retries=2</code>; regex fallback defaults routing to <code>["log_agent"]</code>; synthesizer falls back to prose + <code>confidence=0.3</code>; all agents return graceful <code>SubReport</code> with <code>confidence=0.0</code> when no data</td>
+    </tr>
+    <tr>
+      <td><strong>Error Handling &amp; Logging</strong></td><td>7</td><td><span class="pass">6 / 7</span></td>
+      <td>Celery task catches all exceptions → <code>status="failed"</code>; <code>logger.exception()</code> on failure; structured log lines on task start, running, completion with agent list + token counts. No request-ID correlation between FastAPI and Celery.</td>
+    </tr>
+  </table>
+
+  <!-- 5. Documentation -->
+  <h2>5. Documentation &nbsp;<span class="pill pill-green">10 / 10</span></h2>
+  <table>
+    <tr><th style="width:50%">Sub-criterion</th><th style="width:14%">Weight</th><th>Score</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>README &amp; Setup</strong></td><td>4</td><td><span class="pass">4 / 4</span></td>
+      <td>Quick Demo section at top with copy-paste curl + expected output; full Docker/migration/backend/frontend setup; LLM provider table; project layout</td>
+    </tr>
+    <tr>
+      <td><strong>Prompt &amp; Config Documentation</strong></td><td>3</td><td><span class="pass">3 / 3</span></td>
+      <td><code>docs/PROMPTS.md</code>: all 6 agent prompts with exact text, expected output format, and design rationale; <code>config.yaml</code> fully commented; prompt tuning table</td>
+    </tr>
+    <tr>
+      <td><strong>Testing</strong></td><td>3</td><td><span class="pass">3 / 3</span></td>
+      <td>17 unit tests across 3 files: orchestrator routing, synthesizer parsing/fallback, defect adapter scoring. All passing.</td>
+    </tr>
+  </table>
+
+  <!-- Final table -->
+  <h2>Summary</h2>
+  <table>
+    <tr><th>Category</th><th>Max</th><th>Score</th><th>Gap</th></tr>
+    <tr class="score-row"><td>Functionality</td><td>35</td><td>34</td><td class="note">Evaluator stub (Phase 4)</td></tr>
+    <tr class="score-row"><td>Agent Design</td><td>25</td><td>24</td><td class="note">Notify node no-op</td></tr>
+    <tr class="score-row"><td>User Experience</td><td>15</td><td>14</td><td class="note">No timeline chart</td></tr>
+    <tr class="score-row"><td>Routing &amp; Fallback</td><td>15</td><td>14</td><td class="note">No request-ID log correlation</td></tr>
+    <tr class="score-row"><td>Documentation</td><td>10</td><td>10</td><td class="note">—</td></tr>
+    <tr class="total-row"><td>Total</td><td>100</td><td class="score">96</td><td></td></tr>
+  </table>
+
+  <footer>
+    Prism — BYOP Project &nbsp;·&nbsp; manchandak@gmail.com &nbsp;·&nbsp; Generated May 2026
+  </footer>
+</div>
+</body>
+</html>

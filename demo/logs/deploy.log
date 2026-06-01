@@ -1,0 +1,69 @@
+===== Deployment Pipeline — checkout-service — 2025-05-30 =====
+
+[14:15:00] PIPELINE START  service=checkout-service env=production
+[14:15:01] triggered by: priya@example.com via GitHub Actions workflow_id=8821934
+[14:15:01] branch=main commit=d9f3a1c
+[14:15:01] commit message: "perf: tune db connection pool for cost optimization — reduce idle connections"
+[14:15:01] author: devraj@example.com  reviewed-by: carlos@example.com
+[14:15:02] PR: https://github.com/example/checkout-service/pull/412
+
+[14:15:03] STAGE: build
+[14:15:03]   compiling checkout-service:2.4.1
+[14:15:41]   build SUCCESS  image=checkout-service:d9f3a1c
+
+[14:15:42] STAGE: unit-tests
+[14:15:42]   running 214 unit tests
+[14:16:18]   unit tests PASSED  214/214
+
+[14:16:19] STAGE: integration-tests
+[14:16:19]   running 31 integration tests (stub DB mode)
+[14:17:02]   integration tests PASSED  31/31
+[14:17:02]   NOTE: DB pool tests skipped — pool_size not exercised in stub DB mode
+
+[14:17:03] STAGE: staging-canary
+[14:17:03]   deploying checkout-service:d9f3a1c to staging (5% traffic)
+[14:17:45]   staging canary: 60s observation window
+[14:18:45]   staging error_rate=0.0% latency_p99=48ms — PASSED
+[14:18:46]   NOTE: staging DB pool_size=20 (not changed in staging env — only production config was updated)
+
+[14:18:47] STAGE: config-diff
+[14:18:47]   comparing production config changes:
+[14:18:47]   - DB_POOL_SIZE: 20 → 5         # ← KEY CHANGE: reduce from 20 to 5
+[14:18:47]   - DB_POOL_MAX_OVERFLOW: 10 → 2  # ← KEY CHANGE: reduce overflow from 10 to 2
+[14:18:47]   - DB_POOL_TIMEOUT_MS: 30000 (unchanged)
+[14:18:47]   - DB_IDLE_TIMEOUT_MS: 600000 → 60000
+[14:18:47]   no config approval gate configured for pool_size changes
+
+[14:18:48] STAGE: production-deploy
+[14:18:48]   strategy=rolling-update max_unavailable=0 max_surge=1
+[14:19:10]   pod checkout-service-pod-7d4f8 READY (new version)
+[14:19:22]   pod checkout-service-pod-8b3e1 READY (new version)
+[14:19:34]   old pods terminated
+[14:19:35]   production deploy COMPLETE
+
+[14:28:00] MONITORING: 8m post-deploy observation window
+[14:28:00]   error_rate=0.4% (baseline 0.2%) — within alert threshold (1%)
+[14:29:00]   error_rate=1.1% — approaching threshold
+[14:30:00]   error_rate=4.2% — threshold breached but no auto-rollback configured
+[14:31:00]   error_rate=18.7%
+[14:32:00]   error_rate=38.1% — PagerDuty alert fired
+
+[14:41:00] ON-CALL RESPONSE: priya@example.com acknowledged PagerDuty alert PD-20250530-4821
+[14:41:30] on-call begins investigation
+[14:55:00] root cause identified: DB_POOL_SIZE=5 insufficient for concurrent transactions under production load
+[15:03:00] ROLLBACK INITIATED by priya@example.com
+[15:03:00]   rolling back to deploy sha=f1c2b3a (version 2.4.0)
+[15:03:01]   config rollback: DB_POOL_SIZE: 5 → 20, DB_POOL_MAX_OVERFLOW: 2 → 10
+[15:04:58]   pod checkout-service-pod-9a2c1 READY (rollback version)
+[15:05:01]   old pods terminated
+[15:05:01]   ROLLBACK COMPLETE
+
+[15:12:00] MONITORING: post-rollback observation
+[15:12:00]   error_rate=0.1% — back to baseline
+[15:12:01]   PIPELINE CLOSED  outcome=rolled-back  duration_of_incident=40min
+
+===== Post-Incident Actions Required =====
+  1. Add DB pool config to config approval gate
+  2. Enable pool exhaustion alert (pool_wait_time > 100ms for 60s)
+  3. Add staging→production config parity check to pipeline
+  4. Integration tests should exercise real DB pool under concurrent load

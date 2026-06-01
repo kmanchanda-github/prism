@@ -1,0 +1,39 @@
+# Hugging Face Spaces Dockerfile
+# Runs on port 7860 (HF requirement). Uses SQLite + in-process analysis (no Celery/Redis needed).
+
+# ── Stage 1: build React UI ────────────────────────────────────────────────
+FROM node:20-alpine AS ui-builder
+WORKDIR /ui
+COPY ui/package*.json ./
+RUN npm ci --silent
+COPY ui/ ./
+RUN npm run build
+
+# ── Stage 2: API ───────────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 libpangoft2-1.0-0 libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+COPY pyproject.toml .
+RUN uv pip install --system -e ".[anthropic]"
+
+COPY . .
+COPY --from=ui-builder /ui/dist ./ui/dist
+
+# HF Spaces requires port 7860
+EXPOSE 7860
+
+# Use SQLite (no Postgres needed) and run analysis in-process (no Celery/Redis needed)
+ENV DATABASE_URL="sqlite+aiosqlite:///./prism.db" \
+    CELERY_BROKER_URL="memory://" \
+    CELERY_RESULT_BACKEND="cache+memory://" \
+    BASE_URL="https://huggingface.co/spaces" \
+    SECRET_KEY="hf-demo-secret-change-in-prod"
+
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "7860"]

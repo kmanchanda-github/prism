@@ -1,0 +1,76 @@
+2025-05-30T14:20:01Z INFO  [checkout-service] version=2.4.1 deploy_sha=d9f3a1c startup complete
+2025-05-30T14:20:01Z INFO  [checkout-service] db_pool_size=5 db_pool_max_overflow=2 (changed from 20 in this deploy)
+2025-05-30T14:20:02Z INFO  [checkout-service] connected to postgres host=prod-pg-primary port=5432
+2025-05-30T14:20:02Z INFO  [checkout-service] connected to redis host=prod-redis port=6379
+2025-05-30T14:20:05Z INFO  [checkout-service] health check OK — ready to serve
+
+2025-05-30T14:20:10Z INFO  [checkout-service] POST /checkout/initiate latency=42ms status=200 order_id=ORD-9921
+2025-05-30T14:21:03Z INFO  [checkout-service] POST /checkout/initiate latency=38ms status=200 order_id=ORD-9922
+2025-05-30T14:22:15Z INFO  [checkout-service] POST /checkout/initiate latency=41ms status=200 order_id=ORD-9923
+2025-05-30T14:23:44Z INFO  [checkout-service] POST /checkout/initiate latency=39ms status=200 order_id=ORD-9924
+2025-05-30T14:25:01Z INFO  [checkout-service] POST /checkout/initiate latency=44ms status=200 order_id=ORD-9925
+2025-05-30T14:26:33Z INFO  [checkout-service] POST /checkout/initiate latency=40ms status=200 order_id=ORD-9926
+2025-05-30T14:27:18Z INFO  [checkout-service] POST /checkout/initiate latency=43ms status=200 order_id=ORD-9927
+2025-05-30T14:28:05Z INFO  [checkout-service] POST /checkout/initiate latency=38ms status=200 order_id=ORD-9928
+2025-05-30T14:29:22Z INFO  [checkout-service] POST /checkout/initiate latency=45ms status=200 order_id=ORD-9929
+2025-05-30T14:30:14Z INFO  [checkout-service] POST /checkout/initiate latency=41ms status=200 order_id=ORD-9930
+2025-05-30T14:31:07Z INFO  [checkout-service] POST /checkout/initiate latency=39ms status=200 order_id=ORD-9931
+
+2025-05-30T14:32:01Z WARN  [checkout-service] db pool wait time=312ms (threshold=100ms) — pool may be exhausted
+2025-05-30T14:32:04Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30002ms order_id=ORD-9932
+  java.net.SocketTimeoutException: db connection acquire timeout after 30000ms
+    at com.example.checkout.db.PooledDataSource.getConnection(PooledDataSource.java:142)
+    at com.example.checkout.service.CheckoutService.beginTransaction(CheckoutService.java:87)
+    at com.example.checkout.api.CheckoutController.initiate(CheckoutController.java:55)
+2025-05-30T14:32:07Z INFO  [checkout-service] POST /checkout/initiate latency=45ms status=200 order_id=ORD-9933
+2025-05-30T14:32:09Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9934
+  java.net.SocketTimeoutException: db connection acquire timeout after 30000ms
+    at com.example.checkout.db.PooledDataSource.getConnection(PooledDataSource.java:142)
+    at com.example.checkout.service.CheckoutService.beginTransaction(CheckoutService.java:87)
+    at com.example.checkout.api.CheckoutController.initiate(CheckoutController.java:55)
+2025-05-30T14:32:12Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30003ms order_id=ORD-9935
+  java.net.SocketTimeoutException: db connection acquire timeout after 30000ms
+    at com.example.checkout.db.PooledDataSource.getConnection(PooledDataSource.java:142)
+    at com.example.checkout.service.CheckoutService.beginTransaction(CheckoutService.java:87)
+    at com.example.checkout.api.CheckoutController.initiate(CheckoutController.java:55)
+2025-05-30T14:32:15Z WARN  [checkout-service] active_db_connections=5/5 waiting_requests=18 — pool fully saturated
+2025-05-30T14:32:18Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9936
+2025-05-30T14:32:21Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30002ms order_id=ORD-9937
+2025-05-30T14:32:24Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9938
+2025-05-30T14:32:27Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30003ms order_id=ORD-9939
+2025-05-30T14:32:30Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9940
+2025-05-30T14:32:33Z WARN  [checkout-service] active_db_connections=5/5 waiting_requests=41 — circuit breaker threshold approaching
+2025-05-30T14:33:01Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30002ms order_id=ORD-9941
+2025-05-30T14:33:15Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9942
+2025-05-30T14:34:22Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30002ms order_id=ORD-9943
+2025-05-30T14:35:01Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9944
+2025-05-30T14:36:14Z WARN  [checkout-service] payment-gateway upstream timeout count=87 in last 60s
+2025-05-30T14:37:00Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30002ms order_id=ORD-9945
+2025-05-30T14:38:45Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30001ms order_id=ORD-9946
+2025-05-30T14:39:20Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30002ms order_id=ORD-9947
+2025-05-30T14:40:01Z WARN  [checkout-service] error_rate=0.381 (last 60s) — alerting on-call
+2025-05-30T14:41:00Z INFO  [checkout-service] PagerDuty alert dispatched incident_id=PD-20250530-4821
+
+2025-05-30T14:42:10Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9948
+2025-05-30T14:43:30Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30002ms order_id=ORD-9949
+2025-05-30T14:44:15Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9950
+2025-05-30T14:45:00Z WARN  [checkout-service] active_db_connections=5/5 waiting_requests=63
+2025-05-30T14:46:22Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30002ms order_id=ORD-9951
+2025-05-30T14:50:14Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9952
+2025-05-30T14:55:08Z ERROR [checkout-service] POST /checkout/confirm status=504 latency=30002ms order_id=ORD-9953
+2025-05-30T15:00:33Z ERROR [checkout-service] POST /checkout/initiate status=504 latency=30001ms order_id=ORD-9954
+2025-05-30T15:03:00Z INFO  [checkout-service] received SIGTERM — preparing graceful shutdown (rollback initiated by priya@example.com)
+2025-05-30T15:03:02Z INFO  [checkout-service] draining in-flight requests count=3
+2025-05-30T15:03:10Z INFO  [checkout-service] shutdown complete
+
+2025-05-30T15:05:01Z INFO  [checkout-service] version=2.4.0 deploy_sha=f1c2b3a startup complete
+2025-05-30T15:05:01Z INFO  [checkout-service] db_pool_size=20 db_pool_max_overflow=10 (restored to pre-incident config)
+2025-05-30T15:05:03Z INFO  [checkout-service] connected to postgres host=prod-pg-primary port=5432
+2025-05-30T15:05:05Z INFO  [checkout-service] health check OK — ready to serve
+
+2025-05-30T15:05:10Z INFO  [checkout-service] POST /checkout/initiate latency=41ms status=200 order_id=ORD-9955
+2025-05-30T15:06:02Z INFO  [checkout-service] POST /checkout/initiate latency=39ms status=200 order_id=ORD-9956
+2025-05-30T15:07:15Z INFO  [checkout-service] POST /checkout/initiate latency=42ms status=200 order_id=ORD-9957
+2025-05-30T15:08:44Z INFO  [checkout-service] POST /checkout/confirm latency=44ms status=200 order_id=ORD-9958
+2025-05-30T15:10:01Z INFO  [checkout-service] POST /checkout/initiate latency=40ms status=200 order_id=ORD-9959
+2025-05-30T15:12:00Z INFO  [checkout-service] error_rate=0.001 (last 60s) — back to baseline. Incident resolved.

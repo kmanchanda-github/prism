@@ -1,0 +1,62 @@
+2025-05-30T14:00:01Z LOG   [postgres] autovacuum: processing database "orders_db"
+2025-05-30T14:05:14Z LOG   [postgres] checkpoint starting: time
+2025-05-30T14:05:21Z LOG   [postgres] checkpoint complete: wrote 148 buffers (0.9%); distance=2048 kB
+2025-05-30T14:10:01Z LOG   [postgres] autovacuum: found 0 removable rows in 12 pages of table "orders"
+2025-05-30T14:15:03Z LOG   [postgres] checkpoint starting: time
+2025-05-30T14:20:01Z LOG   [postgres] new connection received host=checkout-service-pod-7d4f8 port=52301 user=checkout_svc db=orders_db
+2025-05-30T14:20:01Z LOG   [postgres] new connection received host=checkout-service-pod-7d4f8 port=52302 user=checkout_svc db=orders_db
+2025-05-30T14:20:01Z LOG   [postgres] new connection received host=checkout-service-pod-7d4f8 port=52303 user=checkout_svc db=orders_db
+2025-05-30T14:20:01Z LOG   [postgres] new connection received host=checkout-service-pod-7d4f8 port=52304 user=checkout_svc db=orders_db
+2025-05-30T14:20:01Z LOG   [postgres] new connection received host=checkout-service-pod-7d4f8 port=52305 user=checkout_svc db=orders_db
+2025-05-30T14:20:02Z LOG   [postgres] connection count for user=checkout_svc is now 5 (max_connections=100, role_limit=none)
+
+2025-05-30T14:25:10Z LOG   [postgres] duration: 38ms  statement: INSERT INTO orders (id, user_id, cart_id, status) VALUES ($1, $2, $3, 'pending')
+2025-05-30T14:27:33Z LOG   [postgres] duration: 41ms  statement: UPDATE orders SET status='confirmed', payment_ref=$1 WHERE id=$2
+2025-05-30T14:29:55Z LOG   [postgres] duration: 39ms  statement: INSERT INTO orders (id, user_id, cart_id, status) VALUES ($1, $2, $3, 'pending')
+2025-05-30T14:31:14Z LOG   [postgres] duration: 43ms  statement: SELECT * FROM inventory WHERE product_id = ANY($1) FOR UPDATE
+
+2025-05-30T14:32:03Z LOG   [postgres] duration: 15234ms statement: SELECT * FROM inventory WHERE product_id = ANY($1) FOR UPDATE
+2025-05-30T14:32:03Z WARN  [postgres] process 28401 still waiting for ShareLock on transaction 7831294 after 5000ms
+  DETAIL:  Process 28401 waits for ShareLock on transaction 7831294; blocked by process 28388.
+  HINT:  See server log for query details.
+  CONTEXT:  while updating tuple (0,42) in relation "inventory"
+2025-05-30T14:32:05Z WARN  [postgres] process 28402 still waiting for ShareLock on transaction 7831295 after 5000ms
+2025-05-30T14:32:07Z WARN  [postgres] process 28403 still waiting for ShareLock on transaction 7831296 after 5000ms
+2025-05-30T14:32:09Z WARN  [postgres] process 28404 still waiting for ShareLock on transaction 7831297 after 5000ms
+2025-05-30T14:32:11Z WARN  [postgres] process 28405 still waiting for ShareLock on transaction 7831298 after 5000ms
+2025-05-30T14:32:14Z ERROR [postgres] all 5 checkout_svc connections are holding long transactions — new requests will block at application layer
+2025-05-30T14:32:15Z LOG   [postgres] connection count for user=checkout_svc is 5/5 (pool exhausted from app perspective)
+2025-05-30T14:32:20Z WARN  [postgres] long-running transaction detected pid=28388 duration=18.4s query=SELECT * FROM inventory WHERE product_id = ANY($1) FOR UPDATE
+2025-05-30T14:32:25Z WARN  [postgres] long-running transaction detected pid=28389 duration=17.9s query=UPDATE orders SET status='confirmed', payment_ref=$1 WHERE id=$2
+2025-05-30T14:33:01Z LOG   [postgres] duration: 29841ms statement: SELECT * FROM inventory WHERE product_id = ANY($1) FOR UPDATE
+2025-05-30T14:33:01Z LOG   [postgres] autovacuum: table "orders_db.public.inventory" rows_inserted=0 rows_updated=891 rows_deleted=0 rows_dead_tuples=1203 — bloat accumulating
+2025-05-30T14:35:14Z WARN  [postgres] long-running transaction pid=28388 duration=203s — possible lock hold without commit
+2025-05-30T14:36:02Z LOG   [postgres] duration: 31002ms statement: UPDATE orders SET status='confirmed', payment_ref=$1 WHERE id=$2
+2025-05-30T14:38:44Z WARN  [postgres] long-running transaction pid=28390 duration=382s — still holding ShareLock
+2025-05-30T14:40:00Z LOG   [postgres] deadlock detected
+  DETAIL:  Process 28401 waits for ShareLock on transaction 7831301; blocked by process 28390.
+            Process 28390 waits for ShareLock on transaction 7831299; blocked by process 28401.
+  HINT:  See server log for query details.
+2025-05-30T14:40:01Z ERROR [postgres] canceling statement due to conflict with deadlock: UPDATE orders SET status='failed', failure_reason='timeout' WHERE id=$2
+2025-05-30T14:41:22Z WARN  [postgres] long-running transactions still present — manual intervention may be needed
+2025-05-30T14:45:00Z LOG   [postgres] pg_stat_activity: 5 connections for checkout_svc, all in state=idle in transaction (aborted)
+2025-05-30T14:50:10Z WARN  [postgres] table bloat for orders_db.public.inventory now estimated at 3.2x normal — autovacuum scheduled
+2025-05-30T15:03:00Z LOG   [postgres] connection terminated host=checkout-service-pod-7d4f8 port=52301 (server disconnect)
+2025-05-30T15:03:00Z LOG   [postgres] connection terminated host=checkout-service-pod-7d4f8 port=52302 (server disconnect)
+2025-05-30T15:03:00Z LOG   [postgres] connection terminated host=checkout-service-pod-7d4f8 port=52303 (server disconnect)
+2025-05-30T15:03:00Z LOG   [postgres] connection terminated host=checkout-service-pod-7d4f8 port=52304 (server disconnect)
+2025-05-30T15:03:00Z LOG   [postgres] connection terminated host=checkout-service-pod-7d4f8 port=52305 (server disconnect)
+
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61001 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61002 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61003 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61004 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61005 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61006 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61007 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] new connection received host=checkout-service-pod-9a2c1 port=61008 user=checkout_svc db=orders_db
+2025-05-30T15:05:01Z LOG   [postgres] connection count for user=checkout_svc is now 20 (pool restored)
+2025-05-30T15:05:10Z LOG   [postgres] duration: 37ms  statement: INSERT INTO orders (id, user_id, cart_id, status) VALUES ($1, $2, $3, 'pending')
+2025-05-30T15:07:22Z LOG   [postgres] duration: 40ms  statement: UPDATE orders SET status='confirmed', payment_ref=$1 WHERE id=$2
+2025-05-30T15:10:14Z LOG   [postgres] autovacuum: cleaning up bloat from incident-period dead tuples in orders_db.public.inventory
+2025-05-30T15:12:01Z LOG   [postgres] system stable — all queries within normal latency thresholds

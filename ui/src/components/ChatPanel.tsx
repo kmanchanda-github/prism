@@ -2,11 +2,16 @@ import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useChat } from "../hooks/useChat";
 
-interface Props { analysisId: string; }
+interface SuggestedEdit { field: string; value: string; }
+interface Props {
+  analysisId: string;
+  onApplyEdit?: (edit: SuggestedEdit) => void;
+}
 
-export function ChatPanel({ analysisId }: Props) {
+export function ChatPanel({ analysisId, onApplyEdit }: Props) {
   const { messages, streaming, send } = useChat(analysisId);
   const [input, setInput] = useState("");
+  const [appliedEdits, setAppliedEdits] = useState<Set<number>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
 
   async function handleSend() {
@@ -15,6 +20,11 @@ export function ChatPanel({ analysisId }: Props) {
     setInput("");
     await send(msg);
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function handleApply(idx: number, edit: SuggestedEdit) {
+    onApplyEdit?.(edit);
+    setAppliedEdits((prev) => new Set(prev).add(idx));
   }
 
   return (
@@ -39,12 +49,26 @@ export function ChatPanel({ analysisId }: Props) {
               <ReactMarkdown className="prose prose-sm max-w-none">{m.content}</ReactMarkdown>
               {m.suggested_edit && (
                 <div className="mt-2 border border-blue-300 bg-blue-50 rounded-lg p-2 text-xs text-blue-800">
-                  <span className="font-medium">Suggested edit to {m.suggested_edit.field}:</span>
-                  <p className="mt-1 line-clamp-2">{m.suggested_edit.value}</p>
-                  <div className="flex gap-2 mt-2">
-                    <button className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
-                    <button className="px-2 py-1 text-blue-600 hover:underline">Dismiss</button>
-                  </div>
+                  <span className="font-medium">Suggested edit to <code>{m.suggested_edit.field}</code>:</span>
+                  <p className="mt-1 line-clamp-3 text-blue-700 italic">{String(m.suggested_edit.value).slice(0, 200)}{String(m.suggested_edit.value).length > 200 ? "…" : ""}</p>
+                  {appliedEdits.has(i) ? (
+                    <p className="mt-2 text-green-700 font-medium">✓ Applied to report</p>
+                  ) : (
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => handleApply(i, m.suggested_edit!)}
+                        className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium"
+                      >
+                        Apply to Report
+                      </button>
+                      <button
+                        onClick={() => setAppliedEdits((prev) => new Set(prev).add(i))}
+                        className="px-2 py-1 text-blue-600 hover:underline"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

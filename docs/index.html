@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Project Docs</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; min-height: 100vh; }
+    header { background: #1a1a2e; padding: 36px 40px 28px; }
+    header h1 { color: #fff; font-size: 1.8em; letter-spacing: -0.01em; }
+    header p  { color: #9ca3af; font-size: 0.95em; margin-top: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px; max-width: 1000px; margin: 40px auto; padding: 0 24px; }
+    .card { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb;
+            padding: 24px; text-decoration: none; color: inherit;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05); transition: box-shadow 0.15s, transform 0.15s; }
+    .card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.11); transform: translateY(-2px); }
+    .card .icon { font-size: 1.8em; margin-bottom: 12px; }
+    .card h2 { font-size: 1em; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+    .card p  { font-size: 0.84em; color: #6b7280; line-height: 1.5; }
+    .card .tag { display: inline-block; margin-top: 12px; font-size: 0.74em; font-weight: 600;
+                 padding: 2px 8px; border-radius: 8px; background: #f0fdf4; color: #15803d; }
+    .card .tag.blue { background: #eff6ff; color: #1d4ed8; }
+    .card .tag.purple { background: #faf5ff; color: #7c3aed; }
+    .card .tag.amber { background: #fffbeb; color: #92400e; }
+    footer { text-align: center; padding: 32px; font-size: 0.78em; color: #9ca3af; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Prism</h1>
+  <p>AI-Powered Incident Analysis Platform &nbsp;·&nbsp; Project Documentation</p>
+</header>
+
+<div class="grid">
+
+  <a class="card" href="rubric-comparison.html">
+    <div class="icon">📊</div>
+    <h2>Rubric Comparison</h2>
+    <p>Final score breakdown against the BYOP grading rubric — category by category with evidence and gap analysis.</p>
+    <span class="tag">96 / 100</span>
+  </a>
+
+  <a class="card" href="../project-report-v3.html">
+    <div class="icon">📄</div>
+    <h2>Project Report v3</h2>
+    <p>Full project report including architecture, agent design, implementation phases, and technology choices.</p>
+    <span class="tag blue">Report</span>
+  </a>
+
+  <a class="card" href="../project-report-v2.html">
+    <div class="icon">📝</div>
+    <h2>Project Report v2</h2>
+    <p>Earlier project report iteration with initial architecture decisions and phase planning.</p>
+    <span class="tag blue">Report</span>
+  </a>
+
+  <a class="card" href="../project-report.html">
+    <div class="icon">🗒️</div>
+    <h2>Project Report v1</h2>
+    <p>Original project report from initial scaffold phase.</p>
+    <span class="tag blue">Report</span>
+  </a>
+
+  <a class="card" href="../tech-stack.html">
+    <div class="icon">🛠️</div>
+    <h2>Tech Stack Reference</h2>
+    <p>Full technology stack reference — backend, frontend, agent framework, infrastructure, and LLM providers.</p>
+    <span class="tag purple">Reference</span>
+  </a>
+
+  <a class="card" href="PROMPTS.md">
+    <div class="icon">🤖</div>
+    <h2>Prompt Design</h2>
+    <p>System prompt documentation for all 6 agents — exact prompts, expected output formats, and design rationale.</p>
+    <span class="tag amber">Agents</span>
+  </a>
+
+</div>
+
+<footer>
+  Prism &nbsp;·&nbsp; <a href="https://github.com/kmanchanda-github/prism" style="color:#6366f1">github.com/kmanchanda-github/prism</a>
+</footer>
+
+</body>
+</html>

@@ -1,6 +1,20 @@
+import logging
+
 from celery import Celery
+from celery.signals import setup_logging
 
 from src.core.config import get_settings
+
+logger = logging.getLogger(__name__)
+
+
+@setup_logging.connect
+def configure_logging(**kwargs):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%SZ",
+    )
 
 settings = get_settings()
 
@@ -22,11 +36,9 @@ celery_app.conf.update(
 
 @celery_app.task(bind=True, name="run_analysis")
 def run_analysis_task(self, analysis_id: str, incident_dict: dict, context: dict, notify_channels: list[str]):
-    """
-    Run the full LangGraph analysis pipeline for one incident.
-    Writes results to Postgres and triggers notifications on completion.
-    """
+    """Run the full LangGraph analysis pipeline for one incident."""
     import asyncio
+    logger.info("task started analysis_id=%s", analysis_id)
     asyncio.run(_run(self, analysis_id, incident_dict, context, notify_channels))
 
 
@@ -57,6 +69,7 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
 
         try:
             incident = Incident(**incident_dict)
+            logger.info("analysis running incident_id=%s analysis_id=%s", incident.id, analysis_id)
             graph = build_graph()
             initial = AnalysisState(
                 incident=incident,
@@ -88,11 +101,19 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
                 .values(status="complete", token_usage=token_data, current_version=0)
             )
             await db.commit()
+            logger.info(
+                "analysis complete analysis_id=%s confidence=%.2f agents=%s tokens=%s",
+                analysis_id,
+                final.confidence_score,
+                [r.agent for r in final.sub_reports],
+                token_data,
+            )
 
             # Send notifications
             await _notify(incident, analysis_id, final, notify_channels, settings)
 
         except Exception as exc:
+            logger.exception("analysis failed analysis_id=%s error=%s", analysis_id, exc)
             await db.execute(
                 update(AnalysisReportORM)
                 .where(AnalysisReportORM.id == analysis_id)

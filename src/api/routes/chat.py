@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -7,7 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
 from src.models.chat import ChatMessage, ChatMessageORM, ChatRequest
+from src.models.incident import Incident, IncidentORM
 from src.models.report import AnalysisReportORM, AnalysisVersionORM
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["chat"])
 
@@ -22,8 +26,24 @@ async def chat(
     if not report:
         raise HTTPException(status_code=404, detail="Analysis not found")
 
-    # Load current version
+    # Load incident for full chat context
+    incident_orm = await db.get(IncidentORM, report.incident_id)
+    incident: Incident | None = None
+    if incident_orm:
+        incident = Incident(
+            id=incident_orm.id,
+            source=incident_orm.source,
+            title=incident_orm.title,
+            description=incident_orm.description,
+            severity=incident_orm.severity,
+            metadata=incident_orm.metadata_json or {},
+            sources_hint=incident_orm.sources_hint,
+            created_at=incident_orm.created_at,
+        )
+
+    # Load current version and its sub-reports
     current_version = None
+    sub_reports = []
     if report.status == "complete":
         result = await db.execute(
             select(AnalysisVersionORM)
@@ -31,6 +51,9 @@ async def chat(
             .where(AnalysisVersionORM.version == report.current_version)
         )
         current_version = result.scalar_one_or_none()
+        if current_version and current_version.sub_reports:
+            from src.models.report import SubReport
+            sub_reports = [SubReport(**r) for r in current_version.sub_reports]
 
     # Load conversation history
     hist_result = await db.execute(
@@ -47,6 +70,8 @@ async def chat(
     db.add(user_msg)
     await db.commit()
 
+    logger.info("chat request analysis_id=%s message_len=%d", analysis_id, len(request.message))
+
     from src.agents.chat_agent import stream_response
 
     full_response = ""
@@ -56,8 +81,8 @@ async def chat(
         nonlocal full_response, suggested_edit
         async for token in stream_response(
             message=request.message,
-            incident=None,        # TODO: load from DB in Phase 2
-            sub_reports=[],
+            incident=incident,
+            sub_reports=sub_reports,
             current_version=current_version,
             history=history,
         ):

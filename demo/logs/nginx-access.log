@@ -1,0 +1,59 @@
+# nginx access log — prod-lb-us-east-1 — 2025-05-30
+# format: $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent $request_time
+
+10.0.1.42 - - [30/May/2025:14:20:03 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.043
+10.0.1.44 - - [30/May/2025:14:20:47 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.041
+10.0.1.51 - - [30/May/2025:14:21:12 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.039
+10.0.1.38 - - [30/May/2025:14:22:05 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.044
+10.0.1.60 - - [30/May/2025:14:23:31 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.040
+10.0.1.42 - - [30/May/2025:14:24:14 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.038
+10.0.1.55 - - [30/May/2025:14:25:02 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.042
+10.0.1.61 - - [30/May/2025:14:26:18 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.041
+10.0.1.48 - - [30/May/2025:14:27:44 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.039
+10.0.1.50 - - [30/May/2025:14:28:22 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.043
+10.0.1.44 - - [30/May/2025:14:29:03 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.040
+10.0.1.38 - - [30/May/2025:14:30:17 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.041
+10.0.1.52 - - [30/May/2025:14:31:02 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.039
+
+# --- 14:32 onward: 504s begin, request RATE unchanged (not a traffic surge) ---
+
+10.0.1.42 - - [30/May/2025:14:32:01 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.44 - - [30/May/2025:14:32:07 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.045
+10.0.1.51 - - [30/May/2025:14:32:09 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.001
+10.0.1.60 - - [30/May/2025:14:32:12 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.003
+10.0.1.38 - - [30/May/2025:14:32:15 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.55 - - [30/May/2025:14:32:18 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.002
+10.0.1.61 - - [30/May/2025:14:32:21 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.48 - - [30/May/2025:14:32:24 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.003
+10.0.1.50 - - [30/May/2025:14:32:27 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.001
+10.0.1.42 - - [30/May/2025:14:32:30 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.44 - - [30/May/2025:14:33:01 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.51 - - [30/May/2025:14:33:45 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.002
+10.0.1.38 - - [30/May/2025:14:34:12 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.60 - - [30/May/2025:14:35:03 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.55 - - [30/May/2025:14:36:17 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.001
+10.0.1.61 - - [30/May/2025:14:37:00 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.48 - - [30/May/2025:14:38:45 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.001
+10.0.1.50 - - [30/May/2025:14:39:20 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.42 - - [30/May/2025:14:40:05 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.44 - - [30/May/2025:14:41:30 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.002
+10.0.1.51 - - [30/May/2025:14:43:15 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.38 - - [30/May/2025:14:44:00 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.002
+10.0.1.60 - - [30/May/2025:14:45:22 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+10.0.1.55 - - [30/May/2025:14:46:10 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.61 - - [30/May/2025:14:50:05 +0000] "POST /checkout/confirm HTTP/1.1" 504 0 30.001
+10.0.1.48 - - [30/May/2025:14:55:44 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.002
+10.0.1.50 - - [30/May/2025:15:00:28 +0000] "POST /checkout/initiate HTTP/1.1" 504 0 30.001
+
+# NOTE: request rate during incident = ~28 req/min (baseline = ~30 req/min)
+# Traffic was NOT elevated — ruling out load spike as root cause
+
+# --- 15:05 onward: rollback deployed, 200s resume ---
+
+10.0.1.42 - - [30/May/2025:15:05:10 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.041
+10.0.1.44 - - [30/May/2025:15:06:02 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.039
+10.0.1.51 - - [30/May/2025:15:07:15 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.042
+10.0.1.38 - - [30/May/2025:15:08:44 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.040
+10.0.1.60 - - [30/May/2025:15:10:01 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.041
+10.0.1.55 - - [30/May/2025:15:11:22 +0000] "POST /checkout/initiate HTTP/1.1" 200 348 0.039
+10.0.1.61 - - [30/May/2025:15:12:00 +0000] "POST /checkout/confirm HTTP/1.1" 200 214 0.043

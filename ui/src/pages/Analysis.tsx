@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useAnalysis } from "../hooks/useAnalysis";
 import { ActionBar } from "../components/ActionBar";
@@ -8,6 +9,24 @@ import { VersionHistory } from "../components/VersionHistory";
 export function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, refetch } = useAnalysis(id!);
+
+  const handleApplyEdit = useCallback(async (field: string, value: string) => {
+    const { version } = data ?? {};
+    if (!version || !id) return;
+    const updated = {
+      root_cause: version.root_cause,
+      workaround: version.workaround,
+      recommended_actions: version.recommended_actions,
+      [field]: value,
+      edit_source: "chat_suggestion",
+    };
+    await fetch(`/api/analysis/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    });
+    refetch();
+  }, [data, id, refetch]);
 
   if (isLoading) {
     return (
@@ -66,10 +85,10 @@ export function AnalysisPage() {
       {/* Main layout */}
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <ReportViewer analysisId={id!} version={version} onSave={refetch} />
+          <ReportViewer analysisId={id!} version={version} onSave={refetch} onApplyEdit={handleApplyEdit} />
           <VersionHistory analysisId={id!} currentVersion={report?.current_version ?? 0} />
         </div>
-        <ChatPanel analysisId={id!} />
+        <ChatPanel analysisId={id!} onApplyEdit={(e) => handleApplyEdit(e.field, e.value)} />
       </div>
 
       {/* Action bar */}
