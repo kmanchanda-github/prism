@@ -37,6 +37,9 @@ celerybeat-schedule
 docs/BYOP - Project Description Template.docx
 docs/Grading Rubric_BYOP Project.xlsx
 
+# Local-only demo recording notes (not for the public repo)
+docs/DEMO_SCRIPT.md
+
 # OS
 .DS_Store
 Thumbs.db
