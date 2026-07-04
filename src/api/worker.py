@@ -33,13 +33,33 @@ celery_app.conf.update(
     worker_max_tasks_per_child=50,  # recycle worker after 50 tasks to prevent memory leaks
 )
 
+# Single-container deployments (e.g. Hugging Face Spaces) run only the API
+# process — no separate `celery worker` ever consumes the queue. Their
+# CELERY_BROKER_URL is set to memory:// specifically to signal that; without
+# eager mode, every task submitted there would sit as "pending" forever.
+if settings.celery_broker_url.startswith("memory://"):
+    celery_app.conf.update(task_always_eager=True, task_eager_propagates=True)
+
 
 @celery_app.task(bind=True, name="run_analysis")
 def run_analysis_task(self, analysis_id: str, incident_dict: dict, context: dict, notify_channels: list[str]):
     """Run the full LangGraph analysis pipeline for one incident."""
     import asyncio
     logger.info("task started analysis_id=%s", analysis_id)
-    asyncio.run(_run(self, analysis_id, incident_dict, context, notify_channels))
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop is not None:
+        # Eager mode (task_always_eager, set above for memory:// deployments)
+        # runs this function directly on the caller's thread — which is
+        # FastAPI's already-running event loop. asyncio.run() would raise
+        # here, so schedule on that loop instead and return immediately.
+        loop.create_task(_run(self, analysis_id, incident_dict, context, notify_channels))
+    else:
+        asyncio.run(_run(self, analysis_id, incident_dict, context, notify_channels))
 
 
 async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notify_channels: list[str]):
