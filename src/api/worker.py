@@ -76,7 +76,9 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
                 context=context,
                 notify_channels=notify_channels,
             )
-            final: AnalysisState = await graph.ainvoke(initial)
+            # graph.ainvoke() returns a plain dict of the output channels, not
+            # an AnalysisState instance — rehydrate so attribute access below works.
+            final = AnalysisState(**await graph.ainvoke(initial))
 
             token_data = final.token_tracker.totals() if final.token_tracker else {}
 

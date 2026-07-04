@@ -5,7 +5,7 @@ from src.adapters.base import DataChunk, DataSourceAdapter
 from src.core.config import get_yaml_config
 from src.models.incident import Incident
 
-_DEMO_DB_PATH = Path(__file__).parents[4] / "demo" / "defects" / "known_issues.json"
+_DEMO_DB_PATH = Path(__file__).parents[3] / "demo" / "defects" / "known_issues.json"
 
 
 class DefectDbAdapter(DataSourceAdapter):

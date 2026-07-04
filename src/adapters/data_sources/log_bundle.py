@@ -6,6 +6,7 @@ from src.core.config import get_yaml_config
 from src.models.incident import Incident
 
 _READABLE_SUFFIXES = {".log", ".txt", ".out", ".err", ".json", ".yaml", ".yml"}
+_DEMO_BUNDLE_PATH = Path(__file__).parents[3] / "demo" / "logs" / "incident-checkout-20250530.zip"
 
 
 class LogBundleAdapter(DataSourceAdapter):
@@ -19,6 +20,8 @@ class LogBundleAdapter(DataSourceAdapter):
 
     async def fetch(self, incident: Incident, context: dict) -> list[DataChunk]:
         bundle_path = context.get("log_bundle_path")
+        if not bundle_path and _DEMO_BUNDLE_PATH.exists():
+            bundle_path = str(_DEMO_BUNDLE_PATH)
         if not bundle_path:
             return []
 

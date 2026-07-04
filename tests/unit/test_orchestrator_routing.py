@@ -108,3 +108,51 @@ def test_sub_reports_accumulate_with_operator_add():
 def test_build_graph_compiles_without_error():
     graph = build_graph()
     assert graph is not None
+
+
+# ---------------------------------------------------------------------------
+# Full graph run — regression test for the dict-vs-AnalysisState bug
+# ---------------------------------------------------------------------------
+
+def _llm_response(content: str):
+    msg = MagicMock()
+    msg.content = content
+    msg.usage_metadata = {"input_tokens": 10, "output_tokens": 5}
+    return msg
+
+
+@pytest.mark.asyncio
+async def test_full_graph_run_result_is_dict_and_rehydrates_to_analysis_state():
+    """graph.ainvoke() returns a plain dict, not an AnalysisState instance —
+    src/api/worker.py must rehydrate it via AnalysisState(**result) before
+    using attribute access. This regression-tests that rehydration path end
+    to end (log_agent's LogBundleAdapter is mocked to return no chunks, so
+    it skips its own LLM call and only route_decision and the synthesizer
+    call the mocked LLM)."""
+    synth_payload = json.dumps({
+        "root_cause": "DB pool reduced from 20 to 5",
+        "workaround": "Roll back pool config",
+        "recommended_actions": [],
+        "confidence_score": 0.85,
+    })
+    mock_llm = AsyncMock()
+    mock_llm.ainvoke = AsyncMock(side_effect=[
+        _llm_response('["log_agent"]'),
+        _llm_response(synth_payload),
+    ])
+
+    incident = _make_incident()
+    initial = AnalysisState(incident=incident)
+
+    with patch("src.agents.orchestrator.get_llm", return_value=mock_llm), \
+         patch("src.agents.synthesizer.get_llm", return_value=mock_llm), \
+         patch("src.agents.log_analyst.LogBundleAdapter.fetch", new=AsyncMock(return_value=[])):
+        graph = build_graph()
+        raw_result = await graph.ainvoke(initial)
+
+    assert isinstance(raw_result, dict)
+
+    final = AnalysisState(**raw_result)
+    assert final.root_cause == "DB pool reduced from 20 to 5"
+    assert final.confidence_score == 0.85
+    assert final.token_tracker is not None

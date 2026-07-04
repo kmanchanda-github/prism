@@ -56,7 +56,7 @@ class CodeChangesAdapter(DataSourceAdapter):
 
     def _search_demo_dir(self, sha: str) -> list[DataChunk]:
         """Look for a .diff file matching the deploy SHA in the demo/code directory."""
-        demo_dir = Path(__file__).parents[4] / "demo" / "code"
+        demo_dir = Path(__file__).parents[3] / "demo" / "code"
         if not demo_dir.exists():
             return []
         for f in demo_dir.glob(f"{sha}*"):

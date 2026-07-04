@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from src.adapters.data_sources.defect_db import DefectDbAdapter
+from src.adapters.data_sources.defect_db import _DEMO_DB_PATH, DefectDbAdapter
 from src.models.incident import Incident
 
 _SAMPLE_DEFECTS = [
@@ -96,6 +96,24 @@ async def test_fetch_returns_empty_when_file_missing():
     adapter = DefectDbAdapter()
     chunks = await adapter.fetch(_incident(), {"defect_db_path": "/nonexistent/path.json"})
     assert chunks == []
+
+
+def test_demo_db_path_resolves_to_real_file():
+    """Regression test: _DEMO_DB_PATH used Path(__file__).parents[4], which
+    resolves one directory above the repo root and silently returned no
+    defects whenever `context` didn't explicitly override the path (i.e. on
+    every real API submission, since the route never sets defect_db_path)."""
+    assert _DEMO_DB_PATH.exists()
+    assert _DEMO_DB_PATH.name == "known_issues.json"
+
+
+@pytest.mark.asyncio
+async def test_fetch_uses_demo_db_by_default_when_no_context_path_given():
+    adapter = DefectDbAdapter()
+    incident = _incident(metadata={"service": "checkout-service"})
+    chunks = await adapter.fetch(incident, {})
+    assert len(chunks) == 1
+    assert "DEFECT-1041" in chunks[0].content
 
 
 @pytest.mark.asyncio
