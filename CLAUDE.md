@@ -47,18 +47,21 @@ ruff format src/
 ```bash
 cd ui
 npm install
-npm run dev      # dev server on :5173, proxies /api to :8000
+npm run dev      # dev server on :5173, proxies /api and /webhooks to :8002 (see docker-compose.yml port remap)
 npm run build    # outputs to ui/dist/ — FastAPI serves this
 ```
 
 ## Architecture at a Glance
 
 **Intake paths:**
-- `POST /api/analysis` (UI form) → Celery task
-- `POST /webhooks/jira` (or `/salesforce`, `/generic`) → validated → Celery task
+- `POST /api/analysis` (UI form) → Celery task — **this is the supported demo/grading path**
+- `POST /webhooks/jira` (HMAC-validated) or `/generic` (any payload) → Celery task — also real
+- `POST /webhooks/salesforce` → returns a `"stub"` status — an extensibility hook, not a wired integration (see below)
 
 **Analysis pipeline** (`src/agents/orchestrator.py`):
 `parse_incident → route_decision → [parallel] log/code/defect agents → synthesizer → quality_check → notify`
+
+**Stubs vs. real integrations:** `src/adapters/` follows an abstract-base-class pattern (`base.py`) specifically so new integrations are a drop-in subclass. Several adapters are intentionally left as stubs to demonstrate that surface without a real backend behind them: `SalesforceAdapter` (no file — only the webhook route exists), Splunk/Datadog data sources (no files), Email/Webex notifications, the workaround-execution approval gate, and the evaluator agent (`run_evaluation()` raises `NotImplementedError`). Don't treat their presence as "incomplete features to finish" without being asked — they're placeholders showing where an implementation would plug in. `LogBundleAdapter`, `JiraAdapter`, and `SlackAdapter` are the real, wired examples of the same pattern.
 
 **Key directories:**
 - `src/agents/` — LangGraph nodes (orchestrator, log/code/defect analysts, synthesizer, chat, evaluator)

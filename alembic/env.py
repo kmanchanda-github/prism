@@ -46,7 +46,9 @@ def do_run_migrations(connection):
 
 async def run_migrations_online() -> None:
     cfg = config.get_section(config.config_ini_section, {})
-    cfg["sqlalchemy.url"] = get_url()
+    # async_engine_from_config needs the async driver — get_url() strips it
+    # for the offline/sync path, so use the raw settings URL here instead.
+    cfg["sqlalchemy.url"] = get_settings().database_url
     connectable = async_engine_from_config(
         cfg, prefix="sqlalchemy.", poolclass=pool.NullPool
     )

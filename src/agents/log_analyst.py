@@ -1,6 +1,7 @@
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.adapters.data_sources.log_bundle import LogBundleAdapter
+from src.agents.confidence import parse_confidence
 from src.core.llm import get_llm
 from src.models.report import SubReport
 
@@ -28,7 +29,8 @@ async def run(state) -> dict:
         "You are a log analysis expert. Analyze the provided logs for the given incident. "
         "Identify error patterns, anomalies, timing issues, and root cause indicators. "
         "Be specific about line references. Conclude with a confidence score (0.0-1.0) "
-        "that these logs contain enough signal for root cause determination."
+        "that these logs contain enough signal for root cause determination. "
+        "State it on its own final line in exactly this format: \"Confidence: 0.XX\"."
     ))
     human = HumanMessage(content=(
         f"Incident: {incident.title}\nDescription: {incident.description}\n\n"
@@ -46,5 +48,5 @@ async def run(state) -> dict:
         agent="log_agent",
         findings=response.content,
         sources_used=[c.source for c in chunks],
-        confidence=0.7,  # TODO: parse from structured response
+        confidence=parse_confidence(response.content),
     )]}

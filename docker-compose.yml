@@ -1,3 +1,7 @@
+# Host-side ports below (5433/6380/8002) are remapped off their defaults to
+# avoid clashing with other stacks running locally. Containers talk to each
+# other over the internal Docker network using the default ports/hostnames
+# (postgres:5432, redis:6379) — see .env.example for both variants.
 services:
   postgres:
     image: postgres:16-alpine

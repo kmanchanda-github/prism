@@ -55,7 +55,16 @@ async def run_synthesis(state) -> dict:
             "confidence_score": 0.3,
         }
 
-    data = json.loads(match.group())
+    try:
+        data = json.loads(match.group())
+    except json.JSONDecodeError:
+        return {
+            "root_cause": response.content,
+            "workaround": "",
+            "recommended_actions": [],
+            "confidence_score": 0.3,
+        }
+
     return {
         "root_cause": data.get("root_cause", ""),
         "workaround": data.get("workaround", ""),

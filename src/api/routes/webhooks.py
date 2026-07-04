@@ -65,8 +65,11 @@ async def jira_webhook(request: Request, db: AsyncSession = Depends(get_db)):
 
 @router.post("/salesforce")
 async def salesforce_webhook(request: Request, db: AsyncSession = Depends(get_db)):
-    # Phase 2: implement SalesforceAdapter
-    return {"status": "not_implemented"}
+    # Extensibility hook: demonstrates where a SalesforceAdapter (subclassing
+    # IncidentSystemAdapter, same as JiraAdapter above) would plug in. Not a
+    # wired integration — the supported demo/grading path is the UI form
+    # (or POST /api/analysis directly), not this route.
+    return {"status": "stub", "detail": "Extensibility hook — no SalesforceAdapter is wired up. See /webhooks/jira for a real implementation of this same interface."}
 
 
 @router.post("/generic")

@@ -90,6 +90,29 @@ async def test_run_synthesis_falls_back_on_no_json():
 
 
 # ---------------------------------------------------------------------------
+# Graceful fallback — braces matched by regex but content isn't valid JSON
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_run_synthesis_falls_back_on_malformed_json():
+    state = _make_state(sub_reports=[
+        SubReport(agent="log_agent", findings="some findings", sources_used=[], confidence=0.5),
+    ])
+    malformed = 'Root cause: {"root_cause": "pool exhaustion", "workaround": }'
+
+    with patch("src.agents.synthesizer.get_llm") as mock_llm_fn:
+        mock_llm = AsyncMock()
+        mock_llm.ainvoke = AsyncMock(return_value=_llm_response(malformed))
+        mock_llm_fn.return_value = mock_llm
+
+        result = await run_synthesis(state)
+
+    assert result["root_cause"] == malformed
+    assert result["recommended_actions"] == []
+    assert result["confidence_score"] == 0.3
+
+
+# ---------------------------------------------------------------------------
 # Confidence score is cast to float even if LLM returns string
 # ---------------------------------------------------------------------------
 

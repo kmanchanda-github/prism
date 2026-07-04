@@ -240,7 +240,7 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">📋 Project Overview &nbsp;·&nbsp; May 2026</div>
+    <div class="hero-badge">📋 Project Overview &nbsp;·&nbsp; July 2026</div>
     <h1>Prism</h1>
     <p>An incident analysis platform that replaces hours of manual triage with an AI pipeline — automatically querying logs, defects, and code, then synthesising a structured report engineers can review, refine, and share.</p>
     <div class="hero-stats">
@@ -278,6 +278,20 @@
     </div>
   </div>
   <div class="note"><strong>Goal:</strong> Given an incident and metadata, automatically query the right data sources in parallel, synthesise findings into a structured report, and let engineers review, chat, edit, and share — all from one UI.</div>
+</div>
+
+<!-- OBJECTIVES -->
+<div class="section">
+  <div class="section-eyebrow">Context</div>
+  <div class="section-title">Objectives</div>
+  <div class="section-sub">Concrete goals the system is designed to meet, derived directly from the problems above.</div>
+  <div class="intake-card">
+    <div class="step"><div class="sn">1</div>Ingest and correlate incident data from logs, code changes, and known defects automatically — remove the manual data-gathering step entirely.</div>
+    <div class="step"><div class="sn">2</div>Run the relevant analysis agents in parallel and synthesise their findings into one structured report: root cause, workaround, prioritised actions, and a confidence score.</div>
+    <div class="step"><div class="sn">3</div>Let engineers interrogate and refine that report through a conversational AI interface, with every edit tracked as a new version so the original AI output is never lost.</div>
+    <div class="step"><div class="sn">4</div>Support multiple LLM providers (Anthropic, OpenAI, Google, AWS Bedrock) interchangeably via configuration — zero agent code changes to switch.</div>
+    <div class="step" style="margin-bottom:0"><div class="sn">5</div>Generate audience-specific exports (technical PDF, executive PDF/PPT, customer PPT) from the same underlying report data, removing duplicate manual write-ups.</div>
+  </div>
 </div>
 
 <!-- LLM CONFIG -->
@@ -345,7 +359,7 @@
       <div class="arch-row">
         <div class="arch-node n-blue">🖥️ UI Form<small>Manual submission</small></div>
         <div class="arch-arrow">────</div>
-        <div class="arch-node n-green">⚡ Webhook<small>Jira · Salesforce · Generic</small></div>
+        <div class="arch-node n-green">⚡ Webhook<small>Jira · Generic (real) · Salesforce (hook)</small></div>
       </div>
       <div class="arch-down">↓ &nbsp; ↓</div>
       <div class="arch-row">
@@ -361,9 +375,9 @@
       </div>
       <div class="arch-label">parallel execution</div>
       <div class="arch-row" style="gap:10px;flex-wrap:wrap;justify-content:center">
-        <div class="arch-node n-green">📋 Log Agent<small>Bundle · Splunk · Datadog</small></div>
+        <div class="arch-node n-green">📋 Log Agent<small>Bundle (real) · Splunk/Datadog (hook)</small></div>
         <div class="arch-node n-green">💻 Code Agent<small>Git / repo analysis</small></div>
-        <div class="arch-node n-green">🐛 Defect Agent<small>Jira · Salesforce</small></div>
+        <div class="arch-node n-green">🐛 Defect Agent<small>Known-defects DB (real)</small></div>
       </div>
       <div class="arch-down">↓ (results merged)</div>
       <div class="arch-row">
@@ -372,9 +386,9 @@
       <div class="arch-down">↓</div>
       <div class="arch-row" style="flex-wrap:wrap;gap:8px;justify-content:center">
         <div class="arch-node n-gray">📄 Report + Chat UI</div>
-        <div class="arch-node n-gray">🔔 Notify<small>Slack · Email · Webex</small></div>
+        <div class="arch-node n-gray">🔔 Notify<small>Slack (real) · Email/Webex (hook)</small></div>
         <div class="arch-node n-gray">📥 Export<small>PDF · PPT</small></div>
-        <div class="arch-node n-gray">🔧 Workaround<small>Approval gate</small></div>
+        <div class="arch-node n-gray">🔧 Workaround<small>Approval gate (hook)</small></div>
       </div>
     </div>
   </div>
@@ -384,7 +398,7 @@
 <div class="section">
   <div class="section-eyebrow">Flows</div>
   <div class="section-title">Incident Intake</div>
-  <div class="section-sub">Engineers submit manually via the UI form, or incidents are auto-ingested from Jira and other systems via webhooks. Both paths converge on the same pipeline.</div>
+  <div class="section-sub">Engineers submit manually via the UI form, or incidents are auto-ingested from Jira via webhook. Both paths converge on the same pipeline.</div>
   <div class="intake-grid">
     <div class="intake-card">
       <h4>🖥️ Path A — Manual (UI Form)</h4>
@@ -398,12 +412,13 @@
       <div class="step"><div class="sn">1</div>Jira creates or transitions a ticket matching trigger rules</div>
       <div class="step"><div class="sn">2</div>Jira fires webhook → HMAC signature validated</div>
       <div class="step"><div class="sn">3</div>Adapter maps payload to Incident model → Celery task enqueued</div>
-      <div class="step"><div class="sn">4</div>Slack / email sent with deep link to <code style="font-size:.75rem">/analysis/{id}</code></div>
+      <div class="step"><div class="sn">4</div>Slack notification sent with deep link to <code style="font-size:.75rem">/analysis/{id}</code></div>
     </div>
   </div>
   <div style="margin-top:14px;padding:12px 16px;background:var(--gray-100);border-radius:var(--radius);font-size:.82rem;color:var(--gray-600)">
     <strong>Trigger rules</strong> are config-driven in <code>config.yaml</code> — only specific issue types, priorities, and project keys fire analysis, keeping noise low.
   </div>
+  <div class="note"><strong>For this demo:</strong> incidents are created through the UI form — that's the only exercised end-to-end path. Jira/generic webhooks and Slack notification are real too, but Salesforce intake, Email/Webex notification, the workaround approval gate, and the evaluator agent are intentionally left as stubs that demonstrate the pluggable adapter architecture — see the Challenges &amp; Risks section below.</div>
 </div>
 
 <!-- TECH STACK -->
@@ -458,13 +473,55 @@
     <div class="card">
       <div class="card-icon" style="background:#dbeafe">🔌</div>
       <h3>Pluggable Adapters</h3>
-      <p>Every external system sits behind an abstract base class. Add Splunk, Datadog, Salesforce, or any source by subclassing one file and adding one config.yaml entry — no pipeline changes.</p>
+      <p>Every external system sits behind an abstract base class. Log Bundle, Jira, and Slack are real, wired examples; Splunk, Datadog, Salesforce, and Email/Webex are extensibility hooks — add a real one by subclassing one file and adding one config.yaml entry, no pipeline changes.</p>
     </div>
     <div class="card">
       <div class="card-icon" style="background:var(--green-lt)">🔬</div>
-      <h3>Evaluation Agent</h3>
-      <p>On-demand, post-closure agent that scores the prior AI analysis against the actual resolution. Emits prompt-improvement hints for continuous analysis quality improvement.</p>
+      <h3>Evaluation Agent <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--amber-lt);color:var(--amber);padding:2px 7px;border-radius:5px;margin-left:4px;vertical-align:middle">Extensibility hook</span></h3>
+      <p><code>run_evaluation()</code> defines the interface for an on-demand, post-closure agent that would score the prior AI analysis against the actual resolution and emit prompt-improvement hints — currently a documented stub (raises <code>NotImplementedError</code>), showing where that capability would attach.</p>
     </div>
+  </div>
+</div>
+
+<!-- DELIVERABLES -->
+<div class="section">
+  <div class="section-eyebrow">Output</div>
+  <div class="section-title">Deliverables</div>
+  <div class="section-sub">What was actually built and shipped, versus what remains scoped for later phases — see <code>PLAN.md</code> for the full phased breakdown.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Deliverable</th><th>Description</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="td-c">LangGraph orchestration pipeline</td><td class="td-r">Orchestrator + log/code/defect analyst agents + synthesizer, real LLM calls, parallel fan-out via the <code>Send</code> API</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">FastAPI backend</td><td class="td-r">Async REST API, Celery task dispatch, Jira/Salesforce/generic webhook intake with HMAC validation</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">React + TypeScript UI</td><td class="td-r">Submit form, analysis/report viewer, chat panel, version history, action bar</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">PostgreSQL schema + Alembic migrations</td><td class="td-r">6 tables (incidents, analysis reports/versions, chat history, token metrics, action audit log) with a tracked initial migration</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Export pipeline</td><td class="td-r">PDF (technical, executive) via WeasyPrint; PPTX (executive, customer) via python-pptx</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Docker deployment</td><td class="td-r">docker-compose stack (Postgres, Redis, API, worker, beat) + Hugging Face Spaces Dockerfile</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Automated test suite + CI</td><td class="td-r">Unit and integration tests covering routing, synthesis, adapters, and the analysis API; GitHub Actions runs the suite on every push/PR</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Documentation</td><td class="td-r">README, CLAUDE.md, PLAN.md, <code>docs/PROMPTS.md</code> (per-agent prompt design rationale)</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Workaround approval gate, evaluator agent, Splunk/Datadog/Salesforce/Webex/Email adapters</td><td class="td-r">Intentional extensibility hooks demonstrating the pluggable adapter pattern — real interface, no backend wired; see PLAN.md Phase 3/4 for the plan to fill them in</td><td class="td-ch" style="color:var(--amber)">Stub</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MILESTONES -->
+<div class="section">
+  <div class="section-eyebrow">Timeline</div>
+  <div class="section-title">Project Milestones</div>
+  <div class="section-sub">Actual delivery dates, taken from the project's commit history.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Milestone</th><th>Date</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="td-c">Initial scaffold</td><td class="td-ch">2026-05-02</td><td class="td-r">Project structure, config, and design docs committed</td></tr>
+        <tr><td class="td-c">Phase 2 complete</td><td class="td-ch">2026-05-31</td><td class="td-r">All four agents, adapters, exporters, Docker + HF Spaces deploy, and the initial test suite landed</td></tr>
+        <tr><td class="td-c">Hardening pass</td><td class="td-ch">2026-07-04</td><td class="td-r">Alembic baseline migration, environment/port consistency fixes, synthesizer failure handling, integration tests + CI</td></tr>
+        <tr><td class="td-c">Phase 3 — Actions &amp; Notifications</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Workaround approval gate, Webex/Email adapters, token usage dashboard</td></tr>
+        <tr><td class="td-c">Phase 4 — Evaluation &amp; Scale</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Evaluator agent, load testing, concurrency tuning</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -472,7 +529,7 @@
 <div class="section">
   <div class="section-eyebrow">Integrations</div>
   <div class="section-title">Pluggable Adapter Map</div>
-  <div class="section-sub">Subclass one abstract base class per category. Phase 1 adapters are fully implemented; later phases are stubbed and ready to complete.</div>
+  <div class="section-sub">Subclass one abstract base class per category. The green rows are real, wired implementations; the blue/amber rows are intentional stubs demonstrating where a later integration plugs in.</div>
   <div class="adapter-grid">
     <div class="adapter-col">
       <div class="ah" style="background:var(--green-lt);color:#14532d">📂 Data Sources</div>
@@ -600,15 +657,75 @@
     <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/api/analysis/{id}/export</span><span class="ep-desc">Generate PDF or PPTX download</span></div>
     <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/api/analysis/{id}/action</span><span class="ep-desc">Execute workaround / share / notify</span></div>
     <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/webhooks/jira</span><span class="ep-desc">Jira intake (HMAC validated)</span></div>
-    <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/webhooks/salesforce</span><span class="ep-desc">Salesforce case event intake</span></div>
+    <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/webhooks/salesforce</span><span class="ep-desc">Extensibility hook — stub, not wired</span></div>
     <div class="ep"><span class="method mpost">POST</span><span class="ep-path">/webhooks/generic</span><span class="ep-desc">Standard payload for any system</span></div>
+  </div>
+</div>
+
+<!-- CHALLENGES & RISKS -->
+<div class="section">
+  <div class="section-eyebrow">Retrospective</div>
+  <div class="section-title">Challenges &amp; Risks</div>
+  <div class="section-sub">Problems hit during development and how each was mitigated, plus known risks carried forward.</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-icon" style="background:var(--blue-lt)">🧩</div>
+      <h3>LLM Output Reliability</h3>
+      <p>Agents and the synthesizer depend on the LLM returning well-formed JSON. A malformed response could crash the whole analysis. <strong>Mitigation:</strong> regex extraction plus a try/except fallback that degrades to a low-confidence prose result instead of failing the task (<code>src/agents/synthesizer.py</code>).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--purple-lt)">🔀</div>
+      <h3>Parallel State Merging</h3>
+      <p>Multiple agents write findings concurrently during LangGraph's fan-out step; naive state merging can drop or overwrite results. <strong>Mitigation:</strong> <code>Annotated[list[SubReport], operator.add]</code> on the shared state so LangGraph merges sub-reports safely.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--amber-lt)">🔌</div>
+      <h3>Multi-Service Local Environment</h3>
+      <p>Running Postgres/Redis/API alongside other local projects on one machine caused port collisions and a misconfigured broker URL that silently crashed the Celery worker for weeks without anyone noticing. <strong>Mitigation:</strong> documented port remap in <code>docker-compose.yml</code> and <code>.env.example</code>, standardised on Docker-internal service hostnames for the containers.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--green-lt)">🔄</div>
+      <h3>Provider Portability</h3>
+      <p>Supporting four LLM providers without agent code changes risked drift and duplicated logic. <strong>Mitigation:</strong> a single factory (<code>src/core/llm.py</code>) behind <code>get_llm()</code> — only <code>.env</code> changes to switch providers.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:var(--rose-lt)">🗄️</div>
+      <h3>Schema Evolution Without Downtime</h3>
+      <p>The app originally relied on <code>create_tables()</code> at startup with no tracked migration history, making future schema changes risky. <strong>Mitigation:</strong> added a tracked Alembic baseline migration this cycle.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#dbeafe">⚠️</div>
+      <h3>Incomplete Integrations Risk Overstatement</h3>
+      <p>Several integrations (Salesforce, Splunk/Datadog, Webex/Email, the workaround approval gate) are still stubs. <strong>Mitigation:</strong> tracked explicitly as Planned in <code>PLAN.md</code> and the Deliverables table above, rather than presented as complete.</p>
+    </div>
+  </div>
+</div>
+
+<!-- REFERENCES -->
+<div class="section">
+  <div class="section-eyebrow">Appendix</div>
+  <div class="section-title">References</div>
+  <div class="section-sub">Primary documentation for the technologies this project is built on.</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Resource</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="td-c">LangGraph documentation</td><td class="td-r"><code>StateGraph</code>, <code>Send</code> API — agent orchestration reference</td></tr>
+        <tr><td class="td-c">FastAPI documentation</td><td class="td-r">API layer reference</td></tr>
+        <tr><td class="td-c">Celery documentation</td><td class="td-r">Async task queue reference</td></tr>
+        <tr><td class="td-c">SQLAlchemy 2.0 / Alembic documentation</td><td class="td-r">ORM and migrations reference</td></tr>
+        <tr><td class="td-c">Anthropic Claude API documentation</td><td class="td-r">Primary LLM provider reference</td></tr>
+        <tr><td class="td-c">WeasyPrint / python-pptx documentation</td><td class="td-r">Export pipeline reference</td></tr>
+        <tr><td class="td-c">Internal: PLAN.md, docs/PROMPTS.md, README.md, CLAUDE.md</td><td class="td-r">Architecture, prompt design, and setup docs for this repository</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 </div><!-- /container -->
 
 <footer>
-  <strong>Prism</strong> &nbsp;·&nbsp; Project Overview &nbsp;·&nbsp; May 2026<br>
+  <strong>Prism</strong> &nbsp;·&nbsp; Project Overview &nbsp;·&nbsp; July 2026<br>
   &copy; 2026 Kapil Manchanda. All rights reserved. Unauthorised reproduction or distribution of this document is prohibited.
 </footer>
 

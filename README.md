@@ -11,7 +11,7 @@ Prism ingests production incidents, runs a multi-agent LangGraph pipeline to ana
 **1. Submit the incident:**
 
 ```bash
-curl -s -X POST http://localhost:8000/api/analysis \
+curl -s -X POST http://localhost:8002/api/analysis \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Checkout service timeout spike — payment failures",
@@ -31,7 +31,7 @@ curl -s -X POST http://localhost:8000/api/analysis \
 **2. Copy the `id` from the response, then poll until `status` is `complete`:**
 
 ```bash
-curl -s http://localhost:8000/api/analysis/<id> | python3 -m json.tool
+curl -s http://localhost:8002/api/analysis/<id> | python3 -m json.tool
 ```
 
 **3. Open the UI** at http://localhost:5173/analysis/`<id>` to:
@@ -62,6 +62,27 @@ Incident (UI form or Jira/Salesforce webhook)
 
 ---
 
+## Integration Surface — What's Wired vs. What's a Hook
+
+**For demos and grading, create incidents through the UI form (or `POST /api/analysis` directly). That's the only exercised end-to-end path** — everything from intake through the log/code/defect agents, synthesis, and the report UI runs for real on that path.
+
+Several integration points beyond that are intentionally left as **stubs that demonstrate the pluggable adapter architecture** — each one has a real abstract base class and a real route/interface, but no backend wired behind it. They exist to show *where and how* an integration would plug in, not because the feature is half-finished:
+
+| Integration point | Status | What exists |
+|---|---|---|
+| Jira webhook (`POST /webhooks/jira`) | **Real** | `JiraAdapter` — HMAC signature validation, trigger-rule filtering, full pipeline dispatch |
+| Generic webhook (`POST /webhooks/generic`) | **Real** | Accepts any `{title, description, severity, metadata}` payload, dispatches the same pipeline |
+| Salesforce webhook (`POST /webhooks/salesforce`) | **Extensibility hook** | Route exists, returns a `"stub"` status — shows where a `SalesforceAdapter` (same `IncidentSystemAdapter` base class as Jira) would plug in |
+| Slack notifications | **Real** | `SlackAdapter` fires automatically when an analysis completes, if `slack` is in `notify_channels` |
+| Email / Webex notifications, manual re-notify action | **Extensibility hook** | `POST /analysis/{id}/action` records the request to the audit log but doesn't call a delivery backend |
+| Splunk / Datadog log sources | **Extensibility hook** | Not yet implemented — `LogBundleAdapter` (ZIP/directory) is the only real `DataSourceAdapter` |
+| Workaround execution + approval gate | **Extensibility hook** | `POST /analysis/{id}/action` records the request; no LangGraph `interrupt()` gate or execution backend is wired |
+| Evaluator agent | **Extensibility hook** | `run_evaluation()` is a defined interface that raises `NotImplementedError` — shows where post-closure scoring would attach |
+
+Adding a real implementation behind any of these is a matter of subclassing the relevant base class (`src/adapters/base.py`) and registering it — see `CLAUDE.md` for the exact steps.
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -83,25 +104,35 @@ cp .env.example .env
 | `LLM_PROVIDER` | ✅ | `anthropic` |
 | `LLM_MODEL` | ✅ | `claude-sonnet-4-6` |
 | `ANTHROPIC_API_KEY` | ✅ (if anthropic) | `sk-ant-...` |
-| `DATABASE_URL` | ✅ | `postgresql+asyncpg://prism:prism@localhost:5432/prism` |
+| `DATABASE_URL` | ✅ | `postgresql+asyncpg://prism:prism@postgres:5432/prism` |
 | `SECRET_KEY` | ✅ | any 32+ char random string |
-| `CELERY_BROKER_URL` | ✅ | `redis://localhost:6379/0` |
+| `CELERY_BROKER_URL` | ✅ | `redis://redis:6379/0` |
+
+> The examples above use docker-compose's internal service hostnames (`postgres`, `redis`) — that's what the `api`/`worker` containers need. Connecting from the host instead (a local psql client, or running the API without Docker)? Use the host-remapped ports from `docker-compose.yml`: Postgres → `localhost:5433`, Redis → `localhost:6380`, API → `localhost:8002` (remapped to avoid clashing with other local stacks on the default ports).
 
 ### 2. Start infrastructure
 
 ```bash
-docker-compose up -d        # Postgres + Redis
-alembic upgrade head        # Run DB migrations
+docker-compose up -d        # starts Postgres, Redis, API, and Celery workers
 ```
 
-### 3. Backend
+The API container already applies migrations via `create_tables()` on startup, but the project also ships an initial Alembic migration (`alembic/versions/`) for environments that manage schema changes through Alembic instead:
+
+```bash
+alembic upgrade head         # optional — only if not relying on create_tables()
+```
+
+### 3. Backend (optional — only if not using the Dockerized API/worker from step 2)
+
+Useful for local hot-reload development. Stop the containerized `api`/`worker`/`worker-beat` first (`docker-compose stop api worker worker-beat`) so they don't fight over the same Postgres/Redis connections and ports.
 
 ```bash
 # Install (pick one provider):
 uv pip install -e ".[anthropic,dev]"
 # uv pip install -e ".[openai,dev]"
 
-# API server
+# API server — point DATABASE_URL/CELERY_BROKER_URL at the host-remapped
+# ports (localhost:5433, localhost:6380) instead of postgres:5432/redis:6379
 uvicorn src.api.main:app --reload
 
 # Celery worker (separate terminal)
@@ -113,7 +144,7 @@ celery -A src.api.worker.celery_app worker --loglevel=info --concurrency=4
 ```bash
 cd ui
 npm install
-npm run dev      # http://localhost:5173 — proxies /api to :8000
+npm run dev      # http://localhost:5173 — proxies /api and /webhooks to :8002
 ```
 
 ---
@@ -139,7 +170,7 @@ ls demo/defects/known_issues.json
 Submit via API directly:
 
 ```bash
-curl -X POST http://localhost:8000/api/analysis \
+curl -X POST http://localhost:8002/api/analysis \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Checkout service timeout spike — payment failures",
@@ -183,6 +214,7 @@ ruff format src/
 # Tests
 pytest
 pytest tests/unit/
+pytest tests/integration/
 pytest --cov=src --cov-report=term
 
 # DB migration
@@ -206,7 +238,9 @@ ui/src/            # React + Vite frontend
 demo/              # Synthetic data for demo runs (logs, git diff, known defects)
 docs/              # Design documentation
   PROMPTS.md       # System prompt design for every agent — rationale, format, tuning notes
-tests/unit/        # Pytest unit tests (17 tests: routing, synthesizer, defect adapter)
+tests/unit/        # Unit tests (18): routing, synthesizer, defect adapter
+tests/integration/ # Integration tests (5): FastAPI /api/analysis routes end-to-end
+.github/workflows/ # CI — runs the full test suite on push/PR
 ```
 
 ---

@@ -37,13 +37,14 @@ You are a log analysis expert. Analyze the provided logs for the given incident.
 Identify error patterns, anomalies, timing issues, and root cause indicators.
 Be specific about line references. Conclude with a confidence score (0.0-1.0)
 that these logs contain enough signal for root cause determination.
+State it on its own final line in exactly this format: "Confidence: 0.XX".
 ```
 
-**Expected output:** Free-form analysis prose ending with a confidence statement. Confidence is currently hardcoded at `0.7` post-response (a Phase 3 improvement is to parse it from the LLM output via structured output mode).
+**Expected output:** Free-form analysis prose ending with a `Confidence: 0.XX` line. `src/agents/confidence.py::parse_confidence()` extracts it with a regex and clamps it to `[0, 1]`; if the LLM doesn't follow the format, it falls back to a neutral `0.5` rather than crashing.
 
 **Design rationale:**
 - **"Be specific about line references"** — without this instruction, LLMs tend to summarise logs generically. Requiring line-level specificity produces findings that are citable in the final report.
-- **Confidence score in the prompt** — even though the current code hardcodes `0.7`, the instruction primes the LLM to reason about signal quality. Future versions will parse it for use in `quality_check`.
+- **Exact final-line format for the confidence score** — asking for a strict `Confidence: 0.XX` line (rather than a free-form mention anywhere in the prose) makes it reliably extractable with a single regex, without needing a separate structured-output call for a one-line value.
 - **Log chunking** — the adapter caps context at 10 chunks × 50,000 chars each. The prompt is designed to work with partial log data; it asks for "patterns and indicators" rather than assuming completeness.
 
 ---
@@ -62,9 +63,10 @@ Identify:
   3. The risk profile of the change (scope, blast radius, reversibility).
 Be specific — reference file names, line numbers, and config keys from the diff.
 Conclude with a confidence score (0.0–1.0) that this change is the root cause.
+State it on its own final line in exactly this format: "Confidence: 0.XX".
 ```
 
-**Expected output:** Structured prose with three sections as numbered above, concluding with a confidence statement.
+**Expected output:** Structured prose with three sections as numbered above, concluding with a `Confidence: 0.XX` line parsed by the same `parse_confidence()` helper used by every sub-agent.
 
 **Design rationale:**
 - **Three-part structure** ensures the agent covers both the proximate cause (what changed) and the process failure (why it wasn't caught), which together give engineers actionable findings.
@@ -89,9 +91,10 @@ Identify:
      that should have prevented this, and whether they were applied.
 Reference defect IDs (e.g. DEFECT-1041) explicitly.
 Conclude with a confidence score (0.0–1.0) that a known defect is the root cause.
+State it on its own final line in exactly this format: "Confidence: 0.XX".
 ```
 
-**Expected output:** Analysis prose referencing specific defect IDs and their match strength.
+**Expected output:** Analysis prose referencing specific defect IDs and their match strength, ending with a `Confidence: 0.XX` line.
 
 **Design rationale:**
 - **Recurrence framing** is the most valuable output of defect analysis. If the incident is DEFECT-1041 happening for the third time, that changes the recommended action from "fix the config" to "fix the process that keeps allowing this config." The prompt explicitly asks for recurrence detection.
@@ -172,6 +175,12 @@ for every response.
 - **"Only include a suggested_edit when a specific field change is warranted"** — without this guard, the LLM suggests edits on almost every response (it's eager to be helpful). The instruction reduces noise so engineers only see edit prompts when the AI has a concrete, actionable change to propose.
 - **Full sub-agent context injected** — the chat agent receives the raw findings from log/code/defect agents, not just the synthesized summary. This allows it to answer specific questions like "what did the log agent find at 14:32?" without hallucinating.
 - **Streaming:** `stream_response()` yields tokens via SSE so the UI can show typing indicators. `_parse_suggested_edit()` runs on the full assembled response after streaming completes.
+
+---
+
+## Confidence Score Parsing
+
+The log, code, and defect agents (unlike the synthesizer, which returns full JSON) produce free-form prose. Each of their prompts ends with the same instruction — state the score on its own final line as `Confidence: 0.XX` — and every one of them extracts it through the same shared helper, `src/agents/confidence.py::parse_confidence()`. It takes the *last* regex match in the response (so an earlier passing mention of "confidence" in the reasoning doesn't get picked up instead of the concluding statement), clamps the result to `[0, 1]`, and falls back to a neutral `0.5` if the LLM doesn't follow the format — the same "degrade, don't crash" pattern used by the synthesizer's JSON fallback.
 
 ---
 

@@ -441,29 +441,30 @@ GET    /api/metrics/token-usage           # Token usage dashboard data
 - [x] React UI scaffold: IncidentForm, ReportViewer, ChatPanel, ActionBar, VersionHistory
 
 ### Phase 2 — Pluggable Adapters, Chat & Export
-- [ ] SplunkAdapter, DatadogAdapter
-- [ ] JiraAdapter (webhook + polling), SalesforceAdapter
-- [ ] CodeAnalystAgent, DefectAnalystAgent
-- [ ] Adapter registry loaded from config.yaml
-- [ ] Chat agent with SSE streaming + suggested edits
-- [ ] Analysis version history + diff view in UI
-- [ ] PDF technical + executive exporters (WeasyPrint)
-- [ ] PPT executive + customer exporters (python-pptx)
-- [ ] Re-run from any LangGraph checkpoint
+- [ ] SplunkAdapter, DatadogAdapter — not started
+- [x] JiraAdapter — webhook intake + HMAC signature validation
+- [ ] JiraAdapter polling mode, SalesforceAdapter — `config.yaml` has an `intake_mode: polling` option and `POST /webhooks/salesforce` exists as a route, but neither a poller nor a `SalesforceAdapter` class is implemented; the Salesforce route returns `{"status": "not_implemented"}`
+- [x] CodeAnalystAgent, DefectAnalystAgent
+- [x] Adapter registry loaded from config.yaml — each data-source adapter reads its own `config.yaml` section via `get_yaml_config()`
+- [x] Chat agent with SSE streaming + suggested edits
+- [x] Analysis version history in UI — [ ] diff view — `VersionHistory.tsx` lists versions (author, source, timestamp) but does not render a diff between them
+- [x] PDF technical + executive exporters (WeasyPrint)
+- [x] PPT executive + customer exporters (python-pptx)
+- [ ] Re-run from any LangGraph checkpoint — orchestrator calls `.compile()` with no checkpointer configured
 
 ### Phase 3 — Actions, Notifications & Metrics
-- [ ] SlackAdapter, WebexAdapter, EmailAdapter
-- [ ] Workaround execution with approval gate (LangGraph interrupt)
-- [ ] Action audit log
-- [ ] Token usage dashboard in UI (per-analysis + aggregate trends)
-- [ ] Notification on analysis complete (webhook path)
+- [x] SlackAdapter — [ ] WebexAdapter, EmailAdapter — not started
+- [ ] Workaround execution with approval gate (LangGraph interrupt) — `POST /analysis/{id}/action` currently just logs "requires Phase 3 implementation"
+- [x] Action audit log — every action request is recorded to `ActionAuditORM`, including the not-yet-implemented ones
+- [ ] Token usage dashboard in UI (per-analysis + aggregate trends) — not started
+- [x] Notification on analysis complete — Slack only, sent from `worker._run()` on success
 
 ### Phase 4 — Evaluation Agent & Scale
-- [ ] EvaluatorAgent — on-demand post-closure scoring
-- [ ] Prompt improvement report
-- [ ] Celery concurrency tuning + rate limiting
-- [ ] Load test: 100 concurrent analyses
-- [ ] Hugging Face Spaces / cloud deployment config
+- [ ] EvaluatorAgent — on-demand post-closure scoring — `evaluator.py` is a one-line `NotImplementedError` stub, not wired into the graph
+- [ ] Prompt improvement report — not started
+- [ ] Celery concurrency tuning + rate limiting — `worker_max_tasks_per_child=50` is set; concurrency is 4 in `docker-compose.yml`, not the 100 referenced under Scalability Notes below; no rate limiting implemented
+- [ ] Load test: 100 concurrent analyses — not started
+- [x] Hugging Face Spaces / cloud deployment config — `Dockerfile.huggingface` and `hf-README.md`
 
 ---
 

@@ -3,6 +3,7 @@ import logging
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.adapters.data_sources.code_changes import CodeChangesAdapter
+from src.agents.confidence import parse_confidence
 from src.core.llm import get_llm
 from src.models.report import SubReport
 
@@ -16,7 +17,8 @@ _SYSTEM = (
     "  2. Any missing safeguards (tests, validation, rollback gates) that would have prevented it.\n"
     "  3. The risk profile of the change (scope, blast radius, reversibility).\n"
     "Be specific — reference file names, line numbers, and config keys from the diff. "
-    "Conclude with a confidence score (0.0–1.0) that this change is the root cause."
+    "Conclude with a confidence score (0.0–1.0) that this change is the root cause. "
+    "State it on its own final line in exactly this format: \"Confidence: 0.XX\"."
 )
 
 
@@ -64,5 +66,5 @@ async def run(state) -> dict:
         agent="code_agent",
         findings=response.content,
         sources_used=[c.source for c in chunks],
-        confidence=0.75,
+        confidence=parse_confidence(response.content),
     )]}

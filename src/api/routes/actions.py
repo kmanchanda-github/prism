@@ -37,12 +37,17 @@ async def execute_action(
     result_msg = "ok"
 
     if request.action_type == "execute_workaround":
-        # Phase 3: LangGraph interrupt-based approval gate
-        result_msg = "Workaround execution requires Phase 3 implementation."
+        # Extensibility hook: demonstrates where a LangGraph `interrupt()`
+        # approval gate would plug in before executing a workaround. Not wired
+        # to any execution backend — recorded to the audit log only.
+        result_msg = "Extensibility hook — no workaround-execution backend or approval gate is wired up yet."
 
     elif request.action_type in ("notify_slack", "notify_email", "notify_webex"):
-        # Phase 3: trigger notification adapters
-        result_msg = "Notification adapters available in Phase 3."
+        # Note: Slack IS implemented (src/adapters/notifications/slack.py) and
+        # fires for real on analysis completion via worker._run() -> _notify().
+        # This manual re-notify action, and Email/Webex specifically, are
+        # extensibility hooks — the interface exists, no backend call is made here.
+        result_msg = "Extensibility hook — manual re-notify isn't wired to a delivery backend here. Slack notifications do fire automatically on analysis completion."
 
     audit.result = result_msg
     db.add(audit)

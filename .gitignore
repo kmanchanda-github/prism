@@ -30,6 +30,13 @@ ui/.vite/
 # Alembic
 alembic/versions/*.pyc
 
+# Celery runtime artifacts
+celerybeat-schedule
+
+# Course-provided grading materials (not project source)
+docs/BYOP - Project Description Template.docx
+docs/Grading Rubric_BYOP Project.xlsx
+
 # OS
 .DS_Store
 Thumbs.db
