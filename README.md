@@ -2,6 +2,15 @@
 
 Prism ingests production incidents, runs a multi-agent LangGraph pipeline to analyse logs, code changes, and known defects, then delivers a structured root-cause report with recommended actions. Engineers can chat with the AI, edit the report, track version history, and export to PDF or PPTX.
 
+| Link | What it is |
+|---|---|
+| [kapilmanchanda-prism.hf.space](https://kapilmanchanda-prism.hf.space) | Live demo — submit a real incident, no setup required |
+| [.../analysis/demo-seed-analysis-0001](https://kapilmanchanda-prism.hf.space/analysis/demo-seed-analysis-0001) | Pre-seeded example — 3 versions, chat history, an applied evaluation lesson |
+| [github.com/kmanchanda-github/prism](https://github.com/kmanchanda-github/prism) | Source code |
+| [Project Report](https://kmanchanda-github.github.io/prism/project-report-v3.html) | Architecture, agent design, tech stack, deliverables, milestones |
+| [Tech Stack Reference](https://kmanchanda-github.github.io/prism/tech-stack.html) | Full technology stack breakdown |
+| [Prompt Design](https://github.com/kmanchanda-github/prism/blob/main/docs/PROMPTS.md) | System prompts and design rationale for every agent |
+
 ---
 
 ## Quick Demo (5 minutes)
