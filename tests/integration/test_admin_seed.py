@@ -62,6 +62,7 @@ async def test_seed_demo_creates_full_analysis_when_enabled(client, monkeypatch)
     assert body["report"]["status"] == "complete"
     assert body["version"]["version"] == 2
     assert body["version"]["edit_source"] == "chat_suggestion"
+    assert body["version"]["applied_hints"], "seed data should demo the lessons-applied UI"
 
     versions = await client.get(f"/api/analysis/{analysis_id}/versions")
     assert len(versions.json()) == 3

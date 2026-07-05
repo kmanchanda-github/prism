@@ -93,6 +93,10 @@ _WORKAROUND = (
     "Revert the connection pool size to 20 and redeploy. Longer term: require review "
     "on connection-pool changes specifically."
 )
+_APPLIED_HINTS = [
+    "Load-test connection pool size changes against realistic concurrency before "
+    "rolling out to production.",
+]
 
 
 @router.post("/seed-demo")
@@ -151,6 +155,7 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
         root_cause=_ROOT_CAUSE_V0, workaround=_WORKAROUND,
         recommended_actions=_RECOMMENDED_ACTIONS, sub_reports=_SUB_REPORTS,
         confidence_score=0.9, edited_by="ai", edit_source="ai_generated",
+        applied_hints=_APPLIED_HINTS,
         created_at=now - timedelta(days=14, minutes=30),
     ))
     db.add(AnalysisVersionORM(
@@ -158,6 +163,7 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
         root_cause=_ROOT_CAUSE_V1, workaround=_WORKAROUND,
         recommended_actions=_RECOMMENDED_ACTIONS, sub_reports=_SUB_REPORTS,
         confidence_score=1.0, edited_by="priya@example.com", edit_source="manual_edit",
+        applied_hints=_APPLIED_HINTS,
         created_at=now - timedelta(days=14, minutes=18),
     ))
     db.add(AnalysisVersionORM(
@@ -165,6 +171,7 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
         root_cause=_ROOT_CAUSE_V2, workaround=_WORKAROUND,
         recommended_actions=_RECOMMENDED_ACTIONS, sub_reports=_SUB_REPORTS,
         confidence_score=1.0, edited_by="ai", edit_source="chat_suggestion",
+        applied_hints=_APPLIED_HINTS,
         created_at=now - timedelta(days=14, minutes=10),
     ))
 
