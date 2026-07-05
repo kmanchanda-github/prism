@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     # App
     base_url: str = "http://localhost:8000"
     secret_key: str
+    enable_demo_seed: bool = False  # gates POST /admin/seed-demo — off unless explicitly enabled
 
     # Optional integrations — read from env, not config.yaml
     jira_base_url: str | None = None

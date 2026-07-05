@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface ChatEntry {
   role: "user" | "assistant";
@@ -9,6 +9,19 @@ export interface ChatEntry {
 export function useChat(analysisId: string) {
   const [messages, setMessages] = useState<ChatEntry[]>([]);
   const [streaming, setStreaming] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/analysis/${analysisId}/chat`)
+      .then((res) => res.json())
+      .then((history: ChatEntry[]) => {
+        if (!cancelled) setMessages(history);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisId]);
 
   async function send(message: string): Promise<{ suggested_edit?: Record<string, string> | null }> {
     setMessages((prev) => [...prev, { role: "user", content: message }]);

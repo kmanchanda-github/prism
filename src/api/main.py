@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.api.routes import analysis, actions, chat, export, webhooks
+from src.api.routes import admin, analysis, actions, chat, export, webhooks
 from src.core.database import create_tables
 
 
@@ -33,6 +33,7 @@ app.include_router(chat.router, prefix="/api")
 app.include_router(actions.router, prefix="/api")
 app.include_router(export.router, prefix="/api")
 app.include_router(webhooks.router)
+app.include_router(admin.router)
 
 # Serve React SPA (built output) — must be last
 _ui_dist = Path(__file__).parent.parent.parent / "ui" / "dist"
