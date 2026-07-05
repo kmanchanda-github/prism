@@ -418,7 +418,7 @@
   <div style="margin-top:14px;padding:12px 16px;background:var(--gray-100);border-radius:var(--radius);font-size:.82rem;color:var(--gray-600)">
     <strong>Trigger rules</strong> are config-driven in <code>config.yaml</code> — only specific issue types, priorities, and project keys fire analysis, keeping noise low.
   </div>
-  <div class="note"><strong>For this demo:</strong> incidents are created through the UI form — that's the only exercised end-to-end path. Jira/generic webhooks and Slack notification are real too, but Salesforce intake, Email/Webex notification, the workaround approval gate, and the evaluator agent are intentionally left as stubs that demonstrate the pluggable adapter architecture — see the Challenges &amp; Risks section below.</div>
+  <div class="note"><strong>For this demo:</strong> incidents are created through the UI form — that's the only exercised end-to-end path. Jira/generic webhooks, Slack notification, and the evaluation feedback loop are all real too, but Salesforce intake, Email/Webex notification, and the workaround approval gate are intentionally left as stubs that demonstrate the pluggable adapter architecture — see the Challenges &amp; Risks section below.</div>
 </div>
 
 <!-- TECH STACK -->
@@ -467,8 +467,8 @@
     </div>
     <div class="card">
       <div class="card-icon" style="background:var(--rose-lt)">📈</div>
-      <h3>Token Usage Tracking</h3>
-      <p>Each analysis records per-agent token counts and estimated cost. Aggregate trends identify which agents are most expensive, enabling targeted prompt optimisation over time.</p>
+      <h3>Token Usage &amp; Cost Tracking</h3>
+      <p>Each analysis records real per-agent token counts and cost, priced for whichever model is actually configured — shown as a table in the report UI. No aggregate cross-analysis dashboard yet.</p>
     </div>
     <div class="card">
       <div class="card-icon" style="background:#dbeafe">🔌</div>
@@ -477,8 +477,8 @@
     </div>
     <div class="card">
       <div class="card-icon" style="background:var(--green-lt)">🔬</div>
-      <h3>Evaluation Agent <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--amber-lt);color:var(--amber);padding:2px 7px;border-radius:5px;margin-left:4px;vertical-align:middle">Extensibility hook</span></h3>
-      <p><code>run_evaluation()</code> defines the interface for an on-demand, post-closure agent that would score the prior AI analysis against the actual resolution and emit prompt-improvement hints — currently a documented stub (raises <code>NotImplementedError</code>), showing where that capability would attach.</p>
+      <h3>Evaluation &amp; Improvement Loop</h3>
+      <p><code>run_evaluation()</code> scores a completed analysis against the actual resolution and produces a hint. That hint is persisted and looked up by service the next time a similar incident comes in, then injected directly into the synthesizer's prompt — a real closed loop, not just a report. Optionally recorded as feedback on the original run in LangSmith.</p>
     </div>
   </div>
 </div>
@@ -500,7 +500,9 @@
         <tr><td class="td-c">Docker deployment</td><td class="td-r">docker-compose stack (Postgres, Redis, API, worker, beat) + Hugging Face Spaces Dockerfile</td><td class="td-ch">Delivered</td></tr>
         <tr><td class="td-c">Automated test suite + CI</td><td class="td-r">Unit and integration tests covering routing, synthesis, adapters, and the analysis API; GitHub Actions runs the suite on every push/PR</td><td class="td-ch">Delivered</td></tr>
         <tr><td class="td-c">Documentation</td><td class="td-r">README, CLAUDE.md, PLAN.md, <code>docs/PROMPTS.md</code> (per-agent prompt design rationale)</td><td class="td-ch">Delivered</td></tr>
-        <tr><td class="td-c">Workaround approval gate, evaluator agent, Splunk/Datadog/Salesforce/Webex/Email adapters</td><td class="td-r">Intentional extensibility hooks demonstrating the pluggable adapter pattern — real interface, no backend wired; see PLAN.md Phase 3/4 for the plan to fill them in</td><td class="td-ch" style="color:var(--amber)">Stub</td></tr>
+        <tr><td class="td-c">Evaluation &amp; improvement feedback loop</td><td class="td-r">Real evaluator agent, persisted improvement hints, injected into the next matching incident's synthesis prompt; optional LangSmith tracing + feedback</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Token usage &amp; cost tracking</td><td class="td-r">Real per-agent token/cost breakdown, priced for the model actually configured, shown in the report UI</td><td class="td-ch">Delivered</td></tr>
+        <tr><td class="td-c">Workaround approval gate, Splunk/Datadog/Salesforce/Webex/Email adapters</td><td class="td-r">Intentional extensibility hooks demonstrating the pluggable adapter pattern — real interface, no backend wired; see PLAN.md Phase 3 for the plan to fill them in</td><td class="td-ch" style="color:var(--amber)">Stub</td></tr>
       </tbody>
     </table>
   </div>
@@ -518,8 +520,9 @@
         <tr><td class="td-c">Initial scaffold</td><td class="td-ch">2026-05-02</td><td class="td-r">Project structure, config, and design docs committed</td></tr>
         <tr><td class="td-c">Phase 2 complete</td><td class="td-ch">2026-05-31</td><td class="td-r">All four agents, adapters, exporters, Docker + HF Spaces deploy, and the initial test suite landed</td></tr>
         <tr><td class="td-c">Hardening pass</td><td class="td-ch">2026-07-04</td><td class="td-r">Alembic baseline migration, environment/port consistency fixes, synthesizer failure handling, integration tests + CI</td></tr>
-        <tr><td class="td-c">Phase 3 — Actions &amp; Notifications</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Workaround approval gate, Webex/Email adapters, token usage dashboard</td></tr>
-        <tr><td class="td-c">Phase 4 — Evaluation &amp; Scale</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Evaluator agent, load testing, concurrency tuning</td></tr>
+        <tr><td class="td-c">Evaluation &amp; improvement loop</td><td class="td-ch">2026-07-05</td><td class="td-r">Real evaluator agent, persisted improvement hints injected into future matching runs, model-aware cost tracking, optional LangSmith tracing/feedback</td></tr>
+        <tr><td class="td-c">Phase 3 — Actions &amp; Notifications</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Workaround approval gate, Webex/Email adapters, aggregate cross-analysis cost dashboard</td></tr>
+        <tr><td class="td-c">Phase 4 — Scale</td><td class="td-ch" style="color:var(--amber)">Planned</td><td class="td-r">Load testing, Celery concurrency tuning</td></tr>
       </tbody>
     </table>
   </div>

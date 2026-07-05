@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
-from src.models.incident import Incident, IncidentCreate
+from src.models.incident import Incident, IncidentCreate, IncidentORM
 from src.models.report import (
     AnalysisEditRequest,
     AnalysisReport,
@@ -32,6 +32,16 @@ async def submit_analysis(
         metadata=incident.metadata,
         sources_hint=incident.sources_hint,
     )
+
+    db.add(IncidentORM(
+        id=inc.id,
+        source=inc.source,
+        title=inc.title,
+        description=inc.description,
+        severity=inc.severity,
+        metadata_json=inc.metadata,
+        sources_hint=inc.sources_hint,
+    ))
 
     analysis_id = str(uuid.uuid4())
     report = AnalysisReportORM(id=analysis_id, incident_id=inc.id, status="pending")

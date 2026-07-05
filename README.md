@@ -77,9 +77,19 @@ Several integration points beyond that are intentionally left as **stubs that de
 | Email / Webex notifications, manual re-notify action | **Extensibility hook** | `POST /analysis/{id}/action` records the request to the audit log but doesn't call a delivery backend |
 | Splunk / Datadog log sources | **Extensibility hook** | Not yet implemented — `LogBundleAdapter` (ZIP/directory) is the only real `DataSourceAdapter` |
 | Workaround execution + approval gate | **Extensibility hook** | `POST /analysis/{id}/action` records the request; no LangGraph `interrupt()` gate or execution backend is wired |
-| Evaluator agent | **Extensibility hook** | `run_evaluation()` is a defined interface that raises `NotImplementedError` — shows where post-closure scoring would attach |
+| Evaluator agent (`POST /analysis/{id}/evaluate`) | **Real** | Scores the AI analysis against the actual resolution, and the resulting hint is looked up by service and injected into the next matching incident's synthesis prompt — a real feedback loop, not just a logged score. Optionally attaches the result as LangSmith feedback on the original trace. |
 
 Adding a real implementation behind any of these is a matter of subclassing the relevant base class (`src/adapters/base.py`) and registering it — see `CLAUDE.md` for the exact steps.
+
+---
+
+## Evaluation, Cost Tracking & the Improvement Loop
+
+Every analysis records real per-agent token counts and estimated cost (`src/core/token_tracker.py`, priced per the model actually in use — shown in the UI under "Token Usage & Cost").
+
+Once an analysis is complete, `POST /api/analysis/{id}/evaluate` (also exposed in the UI) compares the AI's root cause/workaround against what actually happened and returns an accuracy score plus a one-sentence hint. That hint isn't just logged — it's stored (`improvement_hints` table) and looked up by service the next time an incident on that same service is analyzed, then injected directly into the synthesizer's prompt (`src/agents/synthesizer.py`). The API response and UI both show which hints, if any, a given analysis used.
+
+If `LANGCHAIN_TRACING_V2`/`LANGCHAIN_API_KEY` are set (see `.env.example`), every LLM call is traced in [LangSmith](https://smith.langchain.com), and the evaluator additionally attaches its score as feedback on the original synthesis trace. Tracing is entirely optional — everything above works without it.
 
 ---
 
@@ -228,18 +238,19 @@ alembic upgrade head
 
 ```
 src/
-  agents/          # LangGraph nodes: orchestrator, log/code/defect analysts, synthesizer, chat
+  agents/          # LangGraph nodes: orchestrator, log/code/defect analysts, synthesizer, chat, evaluator
   adapters/        # Pluggable data sources (log bundle, code changes, defect DB) and incident systems
   api/             # FastAPI routes + Celery worker
   core/            # Config, DB, LLM factory, token tracker
-  models/          # SQLAlchemy ORM + Pydantic schemas
+  models/          # SQLAlchemy ORM + Pydantic schemas (incident, report, chat, metrics, evaluation)
   outputs/         # PDF (WeasyPrint) and PPTX (python-pptx) exporters
 ui/src/            # React + Vite frontend
 demo/              # Synthetic data for demo runs (logs, git diff, known defects)
+scripts/           # seed_demo_data.sh — preseed a historical analysis for demos
 docs/              # Design documentation
   PROMPTS.md       # System prompt design for every agent — rationale, format, tuning notes
-tests/unit/        # Unit tests (18): routing, synthesizer, defect adapter
-tests/integration/ # Integration tests (5): FastAPI /api/analysis routes end-to-end
+tests/unit/        # Unit tests (49): routing, synthesizer, evaluator, token cost, adapters
+tests/integration/ # Integration tests (11): analysis/admin-seed/evaluation API routes end-to-end
 .github/workflows/ # CI — runs the full test suite on push/PR
 ```
 
@@ -260,4 +271,6 @@ For agent prompt design and tuning guidance, see [`docs/PROMPTS.md`](docs/PROMPT
 | 1 — Core scaffold, models, API, React UI | ✅ Complete |
 | 2 — All three analysis agents, adapters, exports | ✅ Complete |
 | 3 — Workaround approval gate, notification adapters | 🔜 Planned |
-| 4 — Evaluator agent, load testing, cloud deploy | 🔜 Planned |
+| 4 — Evaluator agent + improvement feedback loop | ✅ Complete |
+| 4 — Load testing | 🔜 Planned |
+| Cloud deploy (Hugging Face Spaces) | ✅ Complete |

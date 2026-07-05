@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useAnalysis } from "../hooks/useAnalysis";
 import { ActionBar } from "../components/ActionBar";
 import { ChatPanel } from "../components/ChatPanel";
+import { EvaluationPanel } from "../components/EvaluationPanel";
 import { ReportViewer } from "../components/ReportViewer";
 import { VersionHistory } from "../components/VersionHistory";
 
@@ -85,8 +86,9 @@ export function AnalysisPage() {
       {/* Main layout */}
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <ReportViewer analysisId={id!} version={version} onSave={refetch} onApplyEdit={handleApplyEdit} />
+          <ReportViewer analysisId={id!} version={version} tokenUsage={report?.token_usage} onSave={refetch} onApplyEdit={handleApplyEdit} />
           <VersionHistory analysisId={id!} currentVersion={report?.current_version ?? 0} />
+          <EvaluationPanel analysisId={id!} status={report?.status} />
         </div>
         <ChatPanel analysisId={id!} onApplyEdit={(e) => handleApplyEdit(e.field, e.value)} />
       </div>

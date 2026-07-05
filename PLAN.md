@@ -460,8 +460,9 @@ GET    /api/metrics/token-usage           # Token usage dashboard data
 - [x] Notification on analysis complete — Slack only, sent from `worker._run()` on success
 
 ### Phase 4 — Evaluation Agent & Scale
-- [ ] EvaluatorAgent — on-demand post-closure scoring — `evaluator.py` is a one-line `NotImplementedError` stub, not wired into the graph
-- [ ] Prompt improvement report — not started
+- [x] EvaluatorAgent — on-demand post-closure scoring — `run_evaluation()` in `evaluator.py` is a real LLM call, exposed via `POST /api/analysis/{id}/evaluate`
+- [x] Prompt improvement report — the evaluator's `hint_summary` is persisted per-service (`improvement_hints` table) and injected into the next matching incident's synthesis prompt (`worker.py` looks it up, `synthesizer.py` includes it) — a real feedback loop, not just a report
+- [x] Evaluation observability — optional LangSmith tracing (`LANGCHAIN_TRACING_V2`) plus feedback attached to the original synthesis trace when configured
 - [ ] Celery concurrency tuning + rate limiting — `worker_max_tasks_per_child=50` is set; concurrency is 4 in `docker-compose.yml`, not the 100 referenced under Scalability Notes below; no rate limiting implemented
 - [ ] Load test: 100 concurrent analyses — not started
 - [x] Hugging Face Spaces / cloud deployment config — `Dockerfile.huggingface` and `hf-README.md`

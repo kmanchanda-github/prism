@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_yaml_config
 from src.core.database import get_db
+from src.models.incident import IncidentORM
 from src.models.report import AnalysisReportORM
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -48,6 +49,16 @@ async def jira_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     if not _check_trigger_rules(incident, cfg):
         return {"status": "ignored", "reason": "trigger rules not met"}
 
+    db.add(IncidentORM(
+        id=incident.id,
+        source=incident.source,
+        title=incident.title,
+        description=incident.description,
+        severity=incident.severity,
+        metadata_json=incident.metadata,
+        sources_hint=incident.sources_hint,
+    ))
+
     analysis_id = str(uuid.uuid4())
     report = AnalysisReportORM(id=analysis_id, incident_id=incident.id, status="pending")
     db.add(report)
@@ -89,6 +100,16 @@ async def generic_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         severity=payload.get("severity", "P2"),
         metadata=payload.get("metadata", {}),
     )
+
+    db.add(IncidentORM(
+        id=incident.id,
+        source=incident.source,
+        title=incident.title,
+        description=incident.description,
+        severity=incident.severity,
+        metadata_json=incident.metadata,
+        sources_hint=incident.sources_hint,
+    ))
 
     analysis_id = str(uuid.uuid4())
     report = AnalysisReportORM(id=analysis_id, incident_id=incident.id, status="pending")

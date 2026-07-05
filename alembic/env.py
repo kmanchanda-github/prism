@@ -9,10 +9,11 @@ from src.core.config import get_settings
 from src.core.database import Base
 
 # import all models so Alembic can detect them
-import src.models.incident  # noqa: F401
-import src.models.report    # noqa: F401
-import src.models.chat      # noqa: F401
-import src.models.metrics   # noqa: F401
+import src.models.incident    # noqa: F401
+import src.models.report      # noqa: F401
+import src.models.chat        # noqa: F401
+import src.models.metrics     # noqa: F401
+import src.models.evaluation  # noqa: F401
 
 config = context.config
 if config.config_file_name:

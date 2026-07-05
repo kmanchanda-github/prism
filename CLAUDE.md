@@ -61,7 +61,9 @@ npm run build    # outputs to ui/dist/ — FastAPI serves this
 **Analysis pipeline** (`src/agents/orchestrator.py`):
 `parse_incident → route_decision → [parallel] log/code/defect agents → synthesizer → quality_check → notify`
 
-**Stubs vs. real integrations:** `src/adapters/` follows an abstract-base-class pattern (`base.py`) specifically so new integrations are a drop-in subclass. Several adapters are intentionally left as stubs to demonstrate that surface without a real backend behind them: `SalesforceAdapter` (no file — only the webhook route exists), Splunk/Datadog data sources (no files), Email/Webex notifications, the workaround-execution approval gate, and the evaluator agent (`run_evaluation()` raises `NotImplementedError`). Don't treat their presence as "incomplete features to finish" without being asked — they're placeholders showing where an implementation would plug in. `LogBundleAdapter`, `JiraAdapter`, and `SlackAdapter` are the real, wired examples of the same pattern.
+**Stubs vs. real integrations:** `src/adapters/` follows an abstract-base-class pattern (`base.py`) specifically so new integrations are a drop-in subclass. Several adapters are intentionally left as stubs to demonstrate that surface without a real backend behind them: `SalesforceAdapter` (no file — only the webhook route exists), Splunk/Datadog data sources (no files), Email/Webex notifications, and the workaround-execution approval gate. Don't treat their presence as "incomplete features to finish" without being asked — they're placeholders showing where an implementation would plug in. `LogBundleAdapter`, `JiraAdapter`, `SlackAdapter`, and the evaluator agent (below) are the real, wired examples of the same pattern.
+
+**Evaluation & improvement loop (real, not a stub):** `POST /api/analysis/{id}/evaluate` runs `src/agents/evaluator.py::run_evaluation()` — a real LLM call comparing the AI's analysis against the actual resolution, returning an accuracy score and a one-sentence hint. The hint is persisted (`improvement_hints` table, `src/models/evaluation.py`) and looked up by service in `worker.py` before the *next* matching incident's graph run, then injected into `synthesizer.py`'s prompt — so evaluated runs measurably affect future ones, not just get logged. Optionally, if `LANGCHAIN_TRACING_V2`/`LANGCHAIN_API_KEY` are set, the evaluator also attaches its score as LangSmith feedback on the original synthesis trace (`_attach_langsmith_feedback()` in `src/api/routes/evaluation.py`) — this is a no-op if tracing isn't configured.
 
 **Key directories:**
 - `src/agents/` — LangGraph nodes (orchestrator, log/code/defect analysts, synthesizer, chat, evaluator)
@@ -101,6 +103,6 @@ All credentials go in `.env` (see `.env.example`). The app will fail to start wi
 ## Phase Status
 
 - **Phase 1 (complete):** Core scaffold, models, LangGraph skeleton, log bundle adapter, all API routes, React UI
-- **Phase 2:** Splunk/Datadog adapters, Jira/Salesforce full impl, code+defect agents, full PDF/PPT templates, chat suggested-edit wiring
-- **Phase 3:** Workaround execution approval gate, notification adapters, token usage dashboard
-- **Phase 4:** Evaluator agent, load testing, cloud deployment
+- **Phase 2 (complete):** Code+defect agents, full PDF/PPT templates, chat suggested-edit wiring. Splunk/Datadog adapters and Salesforce full impl remain extensibility hooks (see above).
+- **Phase 3:** Workaround execution approval gate, Email/Webex notification adapters — still hooks. Per-analysis token/cost is shown in the UI; there's no aggregate cross-analysis dashboard yet.
+- **Phase 4 (partially complete):** Evaluator agent + improvement feedback loop — done, including optional LangSmith tracing/feedback. Load testing — not started. Cloud deployment (Hugging Face Spaces) — done.

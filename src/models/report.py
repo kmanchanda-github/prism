@@ -39,6 +39,8 @@ class AnalysisVersionORM(Base):
     confidence_score: Mapped[float] = mapped_column(Float, default=0.0)
     edited_by: Mapped[str] = mapped_column(String, default="ai")
     edit_source: Mapped[str] = mapped_column(String, default="ai_generated")
+    applied_hints: Mapped[list | None] = mapped_column(JSON, nullable=True, default=list)
+    langsmith_run_id: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
@@ -69,6 +71,8 @@ class AnalysisVersion(BaseModel):
     confidence_score: float
     edited_by: str
     edit_source: Literal["ai_generated", "chat_suggestion", "manual_edit"]
+    applied_hints: list[str] | None = None
+    langsmith_run_id: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

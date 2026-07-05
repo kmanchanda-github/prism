@@ -5,11 +5,17 @@ interface Action { id: string; title: string; description: string; priority: str
 interface SubReport { agent: string; findings: string; sources_used: string[]; confidence: number; }
 interface Version {
   root_cause: string; workaround: string; recommended_actions: Action[];
-  confidence_score: number; sub_reports?: SubReport[];
+  confidence_score: number; sub_reports?: SubReport[]; applied_hints?: string[] | null;
 }
-interface Props { analysisId: string; version?: Version; onSave: () => void; onApplyEdit?: (field: string, value: string) => void; }
+interface AgentCost { input: number; output: number; cost_usd: number; }
+interface TokenUsage {
+  per_agent?: Record<string, AgentCost>;
+  total_input?: number; total_output?: number; total_tokens?: number;
+  estimated_cost_usd?: number; model?: string;
+}
+interface Props { analysisId: string; version?: Version; tokenUsage?: TokenUsage; onSave: () => void; onApplyEdit?: (field: string, value: string) => void; }
 
-export function ReportViewer({ analysisId, version, onSave, onApplyEdit }: Props) {
+export function ReportViewer({ analysisId, version, tokenUsage, onSave, onApplyEdit }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Version | null>(null);
   const [saving, setSaving] = useState(false);
@@ -53,6 +59,17 @@ export function ReportViewer({ analysisId, version, onSave, onApplyEdit }: Props
             </div>
         }
       </div>
+
+      {version.applied_hints && version.applied_hints.length > 0 && (
+        <div className="border border-purple-200 bg-purple-50 rounded-lg p-3">
+          <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1.5">
+            💡 {version.applied_hints.length} lesson{version.applied_hints.length > 1 ? "s" : ""} applied from prior evaluations
+          </p>
+          <ul className="text-sm text-purple-800 space-y-1 list-disc list-inside">
+            {version.applied_hints.map((h, i) => <li key={i}>{h}</li>)}
+          </ul>
+        </div>
+      )}
 
       <Section label="Root Cause">
         {editing
@@ -119,6 +136,49 @@ export function ReportViewer({ analysisId, version, onSave, onApplyEdit }: Props
                 );
               })}
             </div>
+          )}
+        </div>
+      )}
+
+      {tokenUsage?.per_agent && Object.keys(tokenUsage.per_agent).length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            Token Usage &amp; Cost
+          </h3>
+          <div className="border border-gray-100 rounded-lg overflow-hidden">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50 text-gray-400">
+                <tr>
+                  <th className="text-left font-medium px-3 py-2">Agent</th>
+                  <th className="text-right font-medium px-3 py-2">Input</th>
+                  <th className="text-right font-medium px-3 py-2">Output</th>
+                  <th className="text-right font-medium px-3 py-2">Cost</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {Object.entries(tokenUsage.per_agent).map(([agent, u]) => (
+                  <tr key={agent}>
+                    <td className="px-3 py-1.5 text-gray-700 capitalize">{agent.replace("_", " ")}</td>
+                    <td className="px-3 py-1.5 text-right text-gray-500">{u.input.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 text-right text-gray-500">{u.output.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 text-right text-gray-700 font-medium">${u.cost_usd.toFixed(4)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-gray-50 border-t border-gray-200">
+                <tr>
+                  <td className="px-3 py-2 font-semibold text-gray-700">Total</td>
+                  <td className="px-3 py-2 text-right text-gray-500">{tokenUsage.total_input?.toLocaleString() ?? "—"}</td>
+                  <td className="px-3 py-2 text-right text-gray-500">{tokenUsage.total_output?.toLocaleString() ?? "—"}</td>
+                  <td className="px-3 py-2 text-right font-semibold text-gray-900">
+                    ${tokenUsage.estimated_cost_usd?.toFixed(4) ?? "0.0000"}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          {tokenUsage.model && (
+            <p className="text-xs text-gray-400 mt-1.5">Priced for {tokenUsage.model} (estimated — not a billing statement)</p>
           )}
         </div>
       )}

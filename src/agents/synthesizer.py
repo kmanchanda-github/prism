@@ -1,5 +1,6 @@
 import json
 import re
+import uuid
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -30,15 +31,33 @@ async def run_synthesis(state) -> dict:
         for r in state.sub_reports
     )
 
-    response = await llm.ainvoke([
-        SystemMessage(content=_SYSTEM),
-        HumanMessage(content=(
-            f"Incident: {state.incident.title}\n"
-            f"Severity: {state.incident.severity}\n"
-            f"Description: {state.incident.description}\n\n"
-            f"Sub-agent findings:\n{findings_text}"
-        )),
-    ])
+    # Lessons from prior evaluated incidents on this same service, looked up
+    # in worker.py before the graph runs — this is what makes evaluation
+    # feedback actually affect future runs, not just get logged and ignored.
+    hints = (state.context or {}).get("improvement_hints") or []
+    hints_text = (
+        "\n\nLessons from previously evaluated incidents on this service:\n"
+        + "\n".join(f"- {h}" for h in hints)
+    ) if hints else ""
+
+    # A caller-supplied run_id becomes the LangSmith trace ID for this call
+    # (when LANGCHAIN_TRACING_V2 is set) — captured here so a later
+    # evaluation can attach feedback to this exact run, not just log a score
+    # nowhere anyone can find it.
+    run_id = uuid.uuid4()
+    response = await llm.ainvoke(
+        [
+            SystemMessage(content=_SYSTEM),
+            HumanMessage(content=(
+                f"Incident: {state.incident.title}\n"
+                f"Severity: {state.incident.severity}\n"
+                f"Description: {state.incident.description}\n\n"
+                f"Sub-agent findings:\n{findings_text}"
+                f"{hints_text}"
+            )),
+        ],
+        config={"run_id": run_id},
+    )
 
     state.token_tracker.record(
         "synthesizer",
@@ -53,6 +72,7 @@ async def run_synthesis(state) -> dict:
             "workaround": "",
             "recommended_actions": [],
             "confidence_score": 0.3,
+            "langsmith_run_id": str(run_id),
         }
 
     try:
@@ -63,6 +83,7 @@ async def run_synthesis(state) -> dict:
             "workaround": "",
             "recommended_actions": [],
             "confidence_score": 0.3,
+            "langsmith_run_id": str(run_id),
         }
 
     return {
@@ -70,4 +91,5 @@ async def run_synthesis(state) -> dict:
         "workaround": data.get("workaround", ""),
         "recommended_actions": data.get("recommended_actions", []),
         "confidence_score": float(data.get("confidence_score", 0.5)),
+        "langsmith_run_id": str(run_id),
     }

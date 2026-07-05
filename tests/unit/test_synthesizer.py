@@ -8,7 +8,7 @@ from src.agents.synthesizer import run_synthesis
 from src.models.report import SubReport
 
 
-def _make_state(sub_reports=None, confidence_score=0.0):
+def _make_state(sub_reports=None, confidence_score=0.0, context=None):
     from src.models.incident import Incident
     incident = Incident(
         id="test-001",
@@ -25,6 +25,7 @@ def _make_state(sub_reports=None, confidence_score=0.0):
     state.sub_reports = sub_reports or []
     state.confidence_score = confidence_score
     state.token_tracker = token_tracker
+    state.context = context if context is not None else {}
     return state
 
 
@@ -135,3 +136,52 @@ async def test_run_synthesis_coerces_confidence_to_float():
 
     assert isinstance(result["confidence_score"], float)
     assert result["confidence_score"] == 0.75
+
+
+# ---------------------------------------------------------------------------
+# Feedback loop — improvement hints from state.context reach the LLM prompt
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_run_synthesis_injects_improvement_hints_into_prompt():
+    """This is the actual proof the feedback loop is real, not decorative:
+    a hint placed in state.context (by worker.py, looked up from a prior
+    evaluation) must appear in the HumanMessage actually sent to the LLM."""
+    payload = {
+        "root_cause": "x", "workaround": "y",
+        "recommended_actions": [], "confidence_score": 0.8,
+    }
+    hint = "Ensure configuration changes affecting resource limits are peer-reviewed."
+    state = _make_state(context={"improvement_hints": [hint]})
+
+    with patch("src.agents.synthesizer.get_llm") as mock_llm_fn:
+        mock_llm = AsyncMock()
+        mock_llm.ainvoke = AsyncMock(return_value=_llm_response(json.dumps(payload)))
+        mock_llm_fn.return_value = mock_llm
+
+        await run_synthesis(state)
+
+    sent_messages = mock_llm.ainvoke.call_args[0][0]
+    human_content = sent_messages[1].content
+    assert hint in human_content
+    assert "previously evaluated incidents" in human_content
+
+
+@pytest.mark.asyncio
+async def test_run_synthesis_omits_hints_section_when_none_available():
+    payload = {
+        "root_cause": "x", "workaround": "y",
+        "recommended_actions": [], "confidence_score": 0.8,
+    }
+    state = _make_state(context={"improvement_hints": []})
+
+    with patch("src.agents.synthesizer.get_llm") as mock_llm_fn:
+        mock_llm = AsyncMock()
+        mock_llm.ainvoke = AsyncMock(return_value=_llm_response(json.dumps(payload)))
+        mock_llm_fn.return_value = mock_llm
+
+        await run_synthesis(state)
+
+    sent_messages = mock_llm.ainvoke.call_args[0][0]
+    human_content = sent_messages[1].content
+    assert "previously evaluated incidents" not in human_content

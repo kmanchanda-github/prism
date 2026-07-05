@@ -71,6 +71,7 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
 
     from src.agents.orchestrator import AnalysisState, build_graph
     from src.core.config import get_settings
+    from src.models.evaluation import ImprovementHintORM
     from src.models.incident import Incident
     from src.models.report import AnalysisReportORM, AnalysisVersionORM
 
@@ -90,10 +91,25 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
         try:
             incident = Incident(**incident_dict)
             logger.info("analysis running incident_id=%s analysis_id=%s", incident.id, analysis_id)
+
+            # Look up lessons from prior evaluated incidents on this same
+            # service — this is the feedback loop: evaluation results feed
+            # forward into the next matching incident's synthesis prompt.
+            applied_hints: list[str] = []
+            service = incident.metadata.get("service", "")
+            if service:
+                hints_result = await db.execute(
+                    select(ImprovementHintORM)
+                    .where(ImprovementHintORM.service == service)
+                    .order_by(ImprovementHintORM.created_at.desc())
+                    .limit(3)
+                )
+                applied_hints = [h.hint_summary for h in hints_result.scalars().all()]
+
             graph = build_graph()
             initial = AnalysisState(
                 incident=incident,
-                context=context,
+                context={**context, "improvement_hints": applied_hints},
                 notify_channels=notify_channels,
             )
             # graph.ainvoke() returns a plain dict of the output channels, not
@@ -114,6 +130,8 @@ async def _run(task, analysis_id: str, incident_dict: dict, context: dict, notif
                 confidence_score=final.confidence_score,
                 edited_by="ai",
                 edit_source="ai_generated",
+                applied_hints=applied_hints,
+                langsmith_run_id=final.langsmith_run_id,
             )
             db.add(version)
 

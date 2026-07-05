@@ -12,6 +12,7 @@ dependencies = [
     # Agents
     "langgraph>=0.2.0",
     "langchain-core>=0.3.0",
+    "langsmith>=0.1.0",    # tracing/observability + evaluation feedback (LANGCHAIN_TRACING_V2)
     # Task queue
     "celery[redis]>=5.4.0",
     "redis>=5.1.0",

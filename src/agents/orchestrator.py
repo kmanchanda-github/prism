@@ -33,6 +33,7 @@ class AnalysisState(BaseModel):
     context: dict = {}         # runtime context: log_bundle_path, etc.
     notify_channels: list[str] = []
     error: str | None = None
+    langsmith_run_id: str | None = None  # synthesizer's LLM call trace ID, for later feedback attachment
 
 
 def _llm():
